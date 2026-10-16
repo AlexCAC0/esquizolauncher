@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EsquizoLauncher - EsquizoStudios</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/variables.css">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/components.css">
+</head>
+<body>
+  <!-- Custom Sleek Borderless Titlebar -->
+  <header class="app-titlebar">
+    <div class="titlebar-drag-region">
+      <div class="app-brand">
+        <svg class="brand-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="#a855f7"/>
+        </svg>
+        <span class="app-name">Esquizo<strong>Launcher</strong></span>
+        <span class="app-badge">CLIENT</span>
+      </div>
+    </div>
+    <div class="window-controls">
+      <button class="win-btn" id="win-min" title="Minimizar">
+        <svg width="10" height="1" viewBox="0 0 10 1"><rect width="10" height="1" fill="currentColor"/></svg>
+      </button>
+      <button class="win-btn" id="win-max" title="Maximizar">
+        <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor"><rect x="0.5" y="0.5" width="9" height="9" rx="1"/></svg>
+      </button>
+      <button class="win-btn win-close" id="win-close" title="Cerrar">
+        <svg width="10" height="10" viewBox="0 0 10 10"><path d="M1 1L9 9M9 1L1 9" stroke="currentColor" stroke-width="1.2"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- Root Application Container -->
+  <div class="app-container">
+
+    <!-- ========================================== -->
+    <!-- ONBOARDING FLOW (Welcome -> TOS -> Login) -->
+    <!-- ========================================== -->
+    <section id="view-onboarding" class="view-screen active">
+      <div class="onboarding-card">
+        
+        <!-- STEP 1: WELCOME -->
+        <div id="onboarding-step-welcome" class="onboarding-step active">
+          <div class="welcome-badge">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="#a855f7"/>
+            </svg>
+          </div>
+          <h1>Bienvenido a <span>EsquizoLauncher</span></h1>
+          <p class="onboarding-subtitle">El cliente oficial para los eventos y torneos de <strong>EsquizoStudios</strong>.</p>
+          <div class="feature-bullets">
+            <div class="bullet-item">
+              <span class="bullet-icon">⚡</span>
+              <div>
+                <strong>Instancias por Código</strong>
+                <p>Acceso instantáneo a eventos mediante códigos únicos de 18 caracteres.</p>
+              </div>
+            </div>
+            <div class="bullet-item">
+              <span class="bullet-icon">🛡️</span>
+              <div>
+                <strong>Protección Anti-Leak</strong>
+                <p>Los mods y recursos de eventos son privados y se limpian automáticamente.</p>
+              </div>
+            </div>
+            <div class="bullet-item">
+              <span class="bullet-icon">📸</span>
+              <div>
+                <strong>Galería F2 Integrada</strong>
+                <p>Tus capturas de pantalla organizadas y listas para compartir.</p>
+              </div>
+            </div>
+          </div>
+          <button class="btn btn-primary btn-large" onclick="goToOnboardingStep('tos')">
+            Comenzar
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+          </button>
+        </div>
+
+        <!-- STEP 2: TERMS AND CONDITIONS (MANDATORY) -->
+        <div id="onboarding-step-tos" class="onboarding-step">
+          <div class="step-header">
+            <h2>Términos y Condiciones</h2>
+            <p>Debes leer y aceptar los términos de EsquizoStudios para poder continuar.</p>
+          </div>
+          <div class="tos-box" id="tos-content-box">
+            <!-- Loaded from backend or fallback -->
+            <p>Cargando términos oficiales de EsquizoStudios...</p>
+          </div>
+          <div class="tos-checkbox-row">
+            <input type="checkbox" id="tos-checkbox" onchange="toggleTosAgreement()">
+            <label for="tos-checkbox">He leído y acepto los Términos y Condiciones de <strong>EsquizoStudios</strong></label>
+          </div>
+          <div class="step-footer">
+            <button class="btn btn-secondary" onclick="goToOnboardingStep('welcome')">Atrás</button>
+            <button class="btn btn-primary" id="btn-accept-tos" disabled onclick="acceptTosAndContinue()">
+              Aceptar y Continuar
+            </button>
+          </div>
+        </div>
+
+        <!-- STEP 3: LOGIN -->
+        <div id="onboarding-step-login" class="onboarding-step">
+          <div class="step-header">
+            <h2>Iniciar Sesión</h2>
+            <p>Selecciona tu tipo de cuenta para ingresar a EsquizoLauncher.</p>
+          </div>
+
+          <div class="login-tabs">
+            <button class="login-tab-btn active" data-logintab="offline" onclick="switchLoginTab('offline')">
+              Cuenta Offline
+            </button>
+            <button class="login-tab-btn" data-logintab="microsoft" onclick="switchLoginTab('microsoft')">
+              Microsoft (Premium)
+            </button>
+          </div>
+
+          <!-- TAB CONTENT: OFFLINE (Username + Discord Link) -->
+          <div id="tab-login-offline" class="login-tab-content active">
+            <form id="form-login-offline" onsubmit="handleOfflineLoginSubmit(event)">
+              <div class="form-group">
+                <label>Nombre de Usuario de Minecraft *</label>
+                <input type="text" id="offline-username" required placeholder="ej: SteveGamer" pattern="^[a-zA-Z0-9_]{3,16}$" title="Entre 3 y 16 caracteres alfanuméricos">
+                <small>El nombre que aparecerá dentro de Minecraft.</small>
+              </div>
+
+              <div class="form-group">
+                <label>Vincular Cuenta de Discord *</label>
+                <div class="discord-link-box">
+                  <div class="discord-icon-badge">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.929 1.793 8.18 1.793 12.061 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.893.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.028zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/>
+                    </svg>
+                  </div>
+                  <div class="discord-link-inputs">
+                    <input type="text" id="offline-discord-id" required placeholder="Tu Discord ID (ej: 789123456789012345)">
+                    <input type="text" id="offline-discord-user" placeholder="Tu usuario de Discord (ej: Steve#0001)">
+                  </div>
+                </div>
+                <small class="discord-help-text">
+                  🔒 La vinculación previene cuentas duplicadas. Solo puedes vincular una cuenta de Discord por usuario. Si ya está vinculada a otro, deberás usar otra o desvincularla desde Ajustes.
+                </small>
+              </div>
+
+              <div id="offline-login-error" class="login-alert-error" style="display: none;"></div>
+
+              <button type="submit" class="btn btn-primary btn-large btn-full" id="btn-submit-offline">
+                Entrar al Launcher
+              </button>
+            </form>
+          </div>
+
+          <!-- TAB CONTENT: MICROSOFT (Premium Check) -->
+          <div id="tab-login-microsoft" class="login-tab-content">
+            <div class="ms-login-box">
+              <div class="ms-logo-badge">
+                <svg width="32" height="32" viewBox="0 0 23 23">
+                  <path fill="#f35325" d="M1 1h10v10H1z"/>
+                  <path fill="#81bc06" d="M12 1h10v10H12z"/>
+                  <path fill="#05a6f0" d="M1 12h10v10H1z"/>
+                  <path fill="#ffba08" d="M12 12h10v10H12z"/>
+                </svg>
+              </div>
+              <h3>Iniciar con Microsoft</h3>
+              <p>Inicia sesión con tu cuenta oficial de Microsoft. <strong>Debe tener comprado Minecraft Java Edition</strong>.</p>
+
+              <div id="ms-code-display" class="ms-code-card" style="display: none;">
+                <p>1. Ingresa en tu navegador a: <a id="ms-link-url" href="#" onclick="openExternalUrl(event, this.href)">microsoft.com/link</a></p>
+                <p>2. Escribe el siguiente código:</p>
+                <div class="ms-user-code" id="ms-user-code">XXXX-XXXX</div>
+                <p class="ms-status-text" id="ms-status-text">Esperando que autorices en tu navegador...</p>
+              </div>
+
+              <div id="ms-login-error" class="login-alert-error" style="display: none;"></div>
+
+              <button class="btn btn-ms btn-large btn-full" id="btn-start-ms" onclick="startMicrosoftLoginFlow()">
+                Iniciar con Microsoft
+              </button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- MAIN CLIENT INTERFACE (Sidebar + Content)  -->
+    <!-- ========================================== -->
+    <div id="view-main" class="main-layout" style="display: none;">
+
+      <!-- LEFT SIDEBAR -->
+      <aside class="launcher-sidebar">
+        <!-- Studio Logo -->
+        <div class="sidebar-top">
+          <div class="studio-logo" title="EsquizoStudios">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+              <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="#c084fc"/>
+            </svg>
+          </div>
+        </div>
+
+        <!-- Navigation Buttons -->
+        <nav class="sidebar-nav">
+          <button class="sidebar-icon-btn active" id="nav-btn-home" data-view="home" title="Inicio">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+              <polyline points="9 22 9 12 15 12 15 22"/>
+            </svg>
+          </button>
+
+          <button class="sidebar-icon-btn" id="nav-btn-gallery" data-view="gallery" title="Galería (Capturas F2)">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+              <circle cx="8.5" cy="8.5" r="1.5"/>
+              <polyline points="21 15 16 10 5 21"/>
+            </svg>
+          </button>
+
+          <div class="sidebar-divider"></div>
+
+          <!-- Dynamic Instance Logos List -->
+          <div class="sidebar-instances-list" id="sidebar-instances-list">
+            <!-- Populated via JS -->
+          </div>
+
+          <!-- Add Instance Button (+) -->
+          <button class="sidebar-icon-btn btn-add-instance" id="btn-add-instance" title="Añadir Instancia (Código de 18 caracteres)">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <line x1="12" y1="5" x2="12" y2="19"/>
+              <line x1="5" y1="12" x2="19" y2="12"/>
+            </svg>
+          </button>
+        </nav>
+
+        <!-- Sidebar Bottom: Player Head & Settings Gear -->
+        <div class="sidebar-bottom">
+          <!-- Player Skin Head -->
+          <button class="sidebar-avatar-btn" id="btn-player-profile" title="Gestionar Cuenta / Cerrar Sesión">
+            <img id="sidebar-skin-head" src="assets/steve.png" alt="Skin">
+          </button>
+
+          <!-- Settings Gear -->
+          <button class="sidebar-icon-btn" id="btn-settings" title="Ajustes del Launcher">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="3"/>
+              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+            </svg>
+          </button>
+        </div>
+      </aside>
+
+      <!-- CENTER DISPLAY CONTAINER -->
+      <main class="launcher-center-view" id="launcher-center-view">
+        <!-- Dynamic Background Wallpaper -->
+        <div class="wallpaper-backdrop" id="wallpaper-backdrop"></div>
+        <div class="wallpaper-vignette"></div>
+
+        <!-- TOP BAR: DYNAMIC GREETING & STATUS -->
+        <div class="center-top-bar">
+          <div class="greeting-box">
+            <!-- Dynamic Greeting: Buenos Días X / Buenas Tardes X / Buenas Noches X -->
+            <h2 id="dynamic-greeting">Buenos Días, Jugador</h2>
+            <p id="announcement-text" class="greeting-sub">¡Bienvenido a los eventos oficiales de EsquizoStudios!</p>
+          </div>
+          <div class="top-status-badge">
+            <span class="status-dot"></span>
+            <span id="api-status-label">Conectado a EsquizoStudios</span>
+          </div>
+        </div>
+
+        <!-- VIEW: HOME (Welcome / No instance selected) -->
+        <section id="panel-home" class="panel-screen active">
+          <div class="home-hero-content">
+            <div class="hero-logo-box">
+              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="#a855f7"/>
+              </svg>
+            </div>
+            <h1 class="hero-title">EsquizoStudios <span>Events</span></h1>
+            <p class="hero-desc">
+              Selecciona una de tus instancias en la barra lateral izquierda o añade una nueva introduciendo el código de acceso proporcionado por los organizadores del evento.
+            </p>
+
+            <div class="quick-actions-row">
+              <button class="btn btn-primary btn-large" onclick="openClaimModal()">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                Ingresar Código de Instancia
+              </button>
+              <button class="btn btn-secondary btn-large" onclick="showGalleryView()">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                Ver Galería (F2)
+              </button>
+            </div>
+          </div>
+        </section>
+
+        <!-- VIEW: INSTANCE DETAILS (Selected instance) -->
+        <section id="panel-instance" class="panel-screen">
+          <div class="instance-view-content">
+            <div class="instance-header-info">
+              <img id="inst-view-logo" class="instance-view-logo" src="assets/default-instance.png" alt="Logo">
+              <div class="instance-text-meta">
+                <div class="instance-tags-row">
+                  <span class="inst-tag" id="inst-view-version">Minecraft 1.20.1</span>
+                  <span class="inst-tag" id="inst-view-loader">Fabric</span>
+                  <span class="inst-tag inst-tag-private">🔒 PRIVADO</span>
+                </div>
+                <h1 id="inst-view-title" class="inst-view-title">Nombre de la Instancia</h1>
+                <p id="inst-view-description" class="inst-view-description">Descripción del evento...</p>
+              </div>
+            </div>
+
+            <!-- Bottom Action Deck: PLAY BUTTON & PROGRESS -->
+            <div class="instance-action-deck">
+              <div class="launch-progress-container" id="launch-progress-container" style="display: none;">
+                <div class="progress-info-row">
+                  <span id="launch-status-text">Comprobando actualizaciones...</span>
+                  <span id="launch-status-percent">0%</span>
+                </div>
+                <div class="progress-bar-track">
+                  <div class="progress-bar-fill" id="launch-progress-bar" style="width: 0%;"></div>
+                </div>
+              </div>
+
+              <div class="action-buttons-row">
+                <button class="btn btn-play" id="btn-play-game" onclick="triggerPlayInstance()">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
+                    <polygon points="5 3 19 12 5 21 5 3"/>
+                  </svg>
+                  <span id="btn-play-label">JUGAR</span>
+                </button>
+              </div>
+
+              <div class="anti-leak-notice">
+                <span>🛡️ Protocolo Anti-Leak Activo:</span> Los mods se cargarán durante la partida y se borrarán automáticamente al cerrar el juego para proteger los recursos de EsquizoStudios.
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- VIEW: GALLERY (F2 Screenshots) -->
+        <section id="panel-gallery" class="panel-screen">
+          <div class="panel-header-row">
+            <div>
+              <h2>Galería de Capturas (F2)</h2>
+              <p>Capturas tomadas dentro de Minecraft durante los eventos.</p>
+            </div>
+            <button class="btn btn-secondary" onclick="openScreenshotsInExplorer()">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+              Abrir Carpeta
+            </button>
+          </div>
+
+          <div class="gallery-grid" id="gallery-grid">
+            <!-- Loaded via JS -->
+          </div>
+        </section>
+
+        <!-- VIEW: SETTINGS -->
+        <section id="panel-settings" class="panel-screen">
+          <div class="panel-header-row">
+            <div>
+              <h2>Ajustes del Launcher</h2>
+              <p>Configura el rendimiento, Java y tu vinculación de cuenta.</p>
+            </div>
+            <button class="btn btn-primary" onclick="saveLauncherSettings()">Guardar Ajustes</button>
+          </div>
+
+          <div class="settings-grid">
+            <!-- RAM Allocation Slider -->
+            <div class="settings-card">
+              <h3>Asignación de Memoria RAM</h3>
+              <p class="settings-desc">Ajusta la cantidad máxima de memoria RAM dedicada a Minecraft.</p>
+              
+              <div class="ram-slider-row">
+                <input type="range" id="ram-slider" min="2048" max="16384" step="512" value="4096" oninput="updateRamSliderDisplay()">
+                <div class="ram-value-display"><strong id="ram-slider-value">4.0</strong> GB</div>
+              </div>
+              <small class="hint">Recomendado para eventos de EsquizoStudios: 4 GB o más.</small>
+            </div>
+
+            <!-- Java Runtime Selector -->
+            <div class="settings-card">
+              <h3>Entorno Java (JRE / JDK)</h3>
+              <p class="settings-desc">Selecciona la instalación de Java con la que se ejecutará el juego.</p>
+              <div class="java-select-row">
+                <select id="java-select">
+                  <option value="">Autodetectar automáticamente (Recomendado)</option>
+                </select>
+                <button class="btn btn-secondary" onclick="browseCustomJava()">Examinar...</button>
+              </div>
+            </div>
+
+            <!-- Account & Discord Unlinking -->
+            <div class="settings-card">
+              <h3>Gestión de Cuenta & Discord</h3>
+              <div class="account-details-box">
+                <div class="account-row">
+                  <span>Usuario Actual:</span>
+                  <strong id="settings-username">-</strong>
+                </div>
+                <div class="account-row">
+                  <span>Tipo de Cuenta:</span>
+                  <span class="badge" id="settings-account-type">Offline</span>
+                </div>
+                <div class="account-row">
+                  <span>Discord Vinculado:</span>
+                  <span id="settings-discord-status">No vinculado</span>
+                </div>
+              </div>
+              <div style="margin-top: 14px;">
+                <button class="btn btn-secondary btn-sm" id="btn-unlink-discord" onclick="unlinkDiscordFromSettings()">
+                  Desvincular Cuenta de Discord
+                </button>
+              </div>
+            </div>
+
+            <!-- About EsquizoStudios -->
+            <div class="settings-card">
+              <h3>Acerca de EsquizoLauncher</h3>
+              <p class="settings-desc">
+                Desarrollado exclusivamente por <strong>EsquizoStudios</strong>.<br>
+                Este software es propietario y <strong>NO es de código abierto</strong>.
+              </p>
+              <div class="copyright-notice">
+                EsquizoStudios &copy; 2026. Todos los derechos reservados.
+              </div>
+            </div>
+          </div>
+        </section>
+
+      </main>
+    </div>
+
+  </div>
+
+  <!-- ========================================== -->
+  <!-- MODALS                                      -->
+  <!-- ========================================== -->
+
+  <!-- MODAL: ADD INSTANCE (18-CHAR ACCESS CODE) -->
+  <div id="modal-add-instance" class="modal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>Añadir Nueva Instancia</h3>
+        <button class="btn-modal-close" onclick="closeModal('modal-add-instance')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p class="modal-desc">
+          Ingresa el <strong>código de acceso de 18 caracteres</strong> que te entregó el staff de EsquizoStudios para registrar la instancia de tu evento.
+        </p>
+
+        <div class="code-input-wrapper">
+          <input type="text" id="access-code-input" class="access-code-input" placeholder="Ej: aB3xK9L2pQ7wR4mY1z" maxlength="18" autocomplete="off" spellcheck="false">
+        </div>
+        <small class="hint">El código contiene exactamente 18 caracteres alfanuméricos mezclando mayúsculas, minúsculas y números.</small>
+
+        <div id="claim-error" class="login-alert-error" style="display: none; margin-top: 14px;"></div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeModal('modal-add-instance')">Cancelar</button>
+        <button class="btn btn-primary" id="btn-claim-instance" onclick="submitClaimInstance()">
+          Verificar y Registrar
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: ACCOUNT MANAGEMENT & LOGOUT -->
+  <div id="modal-accounts" class="modal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>Gestión de Cuentas</h3>
+        <button class="btn-modal-close" onclick="closeModal('modal-accounts')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="current-account-profile">
+          <img id="modal-skin-preview" src="assets/steve.png" alt="Skin">
+          <div>
+            <h4 id="modal-account-name">Steve</h4>
+            <span class="badge" id="modal-account-badge">Offline</span>
+            <p id="modal-discord-tag" style="font-size: 12px; color: #818cf8; margin-top: 4px;"></p>
+          </div>
+        </div>
+
+        <div class="accounts-list-section">
+          <h4>Cuentas Registradas</h4>
+          <div id="modal-accounts-list" class="saved-accounts-list">
+            <!-- Populated via JS -->
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="addNewAccountFromModal()">Añadir Otra Cuenta</button>
+        <button class="btn btn-danger" onclick="logoutCurrentAccount()">Cerrar Sesión</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: FULLSCREEN SCREENSHOT PREVIEW -->
+  <div id="modal-screenshot-preview" class="modal modal-lightbox" onclick="closeModal('modal-screenshot-preview')">
+    <div class="lightbox-content">
+      <img id="lightbox-img" src="" alt="Captura">
+      <div id="lightbox-caption" class="lightbox-caption"></div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="js/sidebar.js"></script>
+  <script src="js/main-view.js"></script>
+  <script src="js/gallery-view.js"></script>
+  <script src="js/settings-view.js"></script>
+  <script src="js/onboarding.js"></script>
+  <script src="js/modals.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

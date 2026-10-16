@@ -1,0 +1,27 @@
+# Dependencies
+node_modules/
+package-lock.json
+
+# Environment & Credentials
+.env
+*.env.local
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Server Dynamic Data & Uploads
+server/data/tmp/
+server/data/database.json*
+server/public/uploads/instances/*/mods/
+
+# Reference Folder (Contains large binary Events Client.exe > 200MB)
+referencia/
+
+# Build artifacts & OS files
+dist/
+build/
+.DS_Store
+Thumbs.db

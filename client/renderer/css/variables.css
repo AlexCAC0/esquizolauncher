@@ -1,0 +1,40 @@
+:root {
+  /* EsquizoStudios Palette: Deep black with rich violet and bluish neon accents */
+  --bg-deep: #07050e;
+  --bg-main: #0c0919;
+  --bg-surface: #140f2b;
+  --bg-card: #191436;
+  --bg-card-hover: #221b47;
+  --bg-input: #0e0a1f;
+
+  /* Accent & Gradients */
+  --primary: #8b5cf6;
+  --primary-hover: #7c3aed;
+  --primary-dark: #6d28d9;
+  --primary-glow: rgba(139, 92, 246, 0.4);
+
+  --secondary: #3b82f6;
+  --secondary-glow: rgba(59, 130, 246, 0.35);
+
+  --accent-cyan: #06b6d4;
+  --accent-pink: #ec4899;
+
+  /* Borders & Dividers */
+  --border-subtle: #241d4a;
+  --border-medium: #382d6e;
+  --border-glow: #8b5cf688;
+
+  /* Typography */
+  --text-white: #ffffff;
+  --text-primary: #f1f5f9;
+  --text-secondary: #94a3b8;
+  --text-muted: #64748b;
+
+  /* States */
+  --success: #10b981;
+  --danger: #ef4444;
+  --warning: #f59e0b;
+
+  --font-main: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+}
