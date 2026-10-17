@@ -21,7 +21,11 @@ async function showSettingsView() {
   const apiInput = document.getElementById('settings-api-url');
   if (apiInput) apiInput.value = settings.api_url || 'http://localhost:3001';
 
-  // 4. Account Details
+  // 4. Discord RPC Client ID
+  const rpcInput = document.getElementById('settings-discord-rpc-id');
+  if (rpcInput) rpcInput.value = settings.discord_client_id || '';
+
+  // 5. Account Details
   if (currentAccount) {
     document.getElementById('settings-username').textContent = currentAccount.username;
     document.getElementById('settings-account-type').textContent = currentAccount.type === 'microsoft' ? 'Microsoft Premium' : 'Offline';
@@ -101,11 +105,15 @@ async function saveLauncherSettings() {
   const apiInput = document.getElementById('settings-api-url');
   const apiUrl = apiInput ? apiInput.value.trim() : 'http://localhost:3001';
 
+  const rpcInput = document.getElementById('settings-discord-rpc-id');
+  const discordClientId = rpcInput ? rpcInput.value.trim() : '';
+
   await window.api.updateSettings({
     ram_max: ramMax,
     java_path: javaPath,
     action_on_play: actionOnPlay,
-    api_url: apiUrl
+    api_url: apiUrl,
+    discord_client_id: discordClientId
   });
 
   if (typeof showToast === 'function') {

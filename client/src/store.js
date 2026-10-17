@@ -22,7 +22,8 @@ const DEFAULT_STATE = {
     ram_max: 4096,
     java_path: '',
     action_on_play: 'keep', // 'keep' | 'minimize' | 'hide'
-    api_url: config.DEFAULT_API_URL
+    api_url: config.DEFAULT_API_URL,
+    discord_client_id: ''
   }
 };
 

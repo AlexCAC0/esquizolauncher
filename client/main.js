@@ -248,7 +248,12 @@ function setupIpcHandlers() {
   });
 
   ipcMain.handle('settings:update', (event, newSettings) => {
-    return store.updateSettings(newSettings);
+    const prevId = store.getSettings().discord_client_id;
+    const updated = store.updateSettings(newSettings);
+    if (newSettings && newSettings.discord_client_id !== undefined && newSettings.discord_client_id !== prevId) {
+      discordRpc.initRpc(newSettings.discord_client_id);
+    }
+    return updated;
   });
 
   ipcMain.handle('system:get-javas', () => {

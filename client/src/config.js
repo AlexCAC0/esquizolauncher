@@ -18,6 +18,9 @@ module.exports = {
   // Default Backend API endpoint (points to private Esquizo server)
   DEFAULT_API_URL: 'http://localhost:3001',
 
+  // Discord Rich Presence Application Client ID (from https://discord.com/developers/applications)
+  DEFAULT_DISCORD_CLIENT_ID: '1342674338947268688',
+
   // Local storage directories
   PATHS: {
     ROOT: LAUNCHER_DIR,
