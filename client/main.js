@@ -26,7 +26,7 @@ function createWindow() {
     minHeight: 620,
     frame: false,
     backgroundColor: '#090714',
-    icon: path.join(__dirname, 'renderer', 'assets', 'esquizo.png'),
+    icon: path.join(__dirname, 'renderer', 'assets', 'logo.png'),
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       contextIsolation: true,
