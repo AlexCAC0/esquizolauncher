@@ -16,9 +16,7 @@
   <header class="app-titlebar">
     <div class="titlebar-drag-region">
       <div class="app-brand">
-        <svg class="brand-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-          <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="#a855f7"/>
-        </svg>
+        <img src="assets/esquizo.png" class="brand-icon" alt="Esquizo" style="width: 18px; height: 18px; border-radius: 4px; object-fit: cover;">
         <span class="app-name">Esquizo<strong>Launcher</strong></span>
         <span class="app-badge">CLIENT</span>
       </div>
@@ -48,9 +46,7 @@
         <!-- STEP 1: WELCOME -->
         <div id="onboarding-step-welcome" class="onboarding-step active">
           <div class="welcome-badge">
-            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="#a855f7"/>
-            </svg>
+            <img src="assets/esquizo.png" alt="EsquizoStudios" style="width: 52px; height: 52px; border-radius: 12px; object-fit: cover;">
           </div>
           <h1>Bienvenido a <span>EsquizoLauncher</span></h1>
           <p class="onboarding-subtitle">El cliente oficial para los eventos y torneos de <strong>EsquizoStudios</strong>.</p>
@@ -73,7 +69,7 @@
               <span class="bullet-icon">📸</span>
               <div>
                 <strong>Galería F2 Integrada</strong>
-                <p>Tus capturas de pantalla organizadas y listas para compartir.</p>
+                <p>Tus capturas de pantalla organizadas, con copia y borrado en un clic.</p>
               </div>
             </div>
           </div>
@@ -199,9 +195,7 @@
         <!-- Studio Logo -->
         <div class="sidebar-top">
           <div class="studio-logo" title="EsquizoStudios">
-            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
-              <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="#c084fc"/>
-            </svg>
+            <img src="assets/esquizo.png" alt="EsquizoStudios" style="width: 38px; height: 38px; border-radius: 10px; object-fit: cover;">
           </div>
         </div>
 
@@ -238,8 +232,15 @@
           </button>
         </nav>
 
-        <!-- Sidebar Bottom: Player Head & Settings Gear -->
+        <!-- Sidebar Bottom: Discord Community, Player Head & Settings Gear -->
         <div class="sidebar-bottom">
+          <!-- Discord Community Button -->
+          <button class="sidebar-icon-btn btn-discord-btn" id="btn-sidebar-discord" title="Unirse al Discord Oficial (discord.gg/VgxHfRkYPn)">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.929 1.793 8.18 1.793 12.061 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.893.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.028zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/>
+            </svg>
+          </button>
+
           <!-- Player Skin Head -->
           <button class="sidebar-avatar-btn" id="btn-player-profile" title="Gestionar Cuenta / Cerrar Sesión">
             <img id="sidebar-skin-head" src="assets/steve.png" alt="Skin">
@@ -261,26 +262,56 @@
         <div class="wallpaper-backdrop" id="wallpaper-backdrop"></div>
         <div class="wallpaper-vignette"></div>
 
-        <!-- TOP BAR: DYNAMIC GREETING & STATUS -->
+        <!-- TOP BAR: DYNAMIC GREETING (WITH PLAYER SKIN HEAD & VIOLET NICK) & STATUS -->
         <div class="center-top-bar">
-          <div class="greeting-box">
-            <!-- Dynamic Greeting: Buenos Días X / Buenas Tardes X / Buenas Noches X -->
-            <h2 id="dynamic-greeting">Buenos Días, Jugador</h2>
-            <p id="announcement-text" class="greeting-sub">¡Bienvenido a los eventos oficiales de EsquizoStudios!</p>
+          <div class="greeting-user-badge">
+            <img id="greeting-avatar-head" class="greeting-avatar-head" src="assets/steve.png" alt="Skin">
+            <div class="greeting-text-group">
+              <h2 id="dynamic-greeting">
+                <span class="greeting-time-text" id="greeting-time-text">¡Buenos Días,</span>
+                <span class="greeting-player-nick" id="greeting-player-nick">Steve</span>!
+              </h2>
+              <p id="announcement-text" class="greeting-sub">¡Bienvenido a los eventos oficiales de EsquizoStudios!</p>
+            </div>
           </div>
+
           <div class="top-status-badge">
             <span class="status-dot"></span>
             <span id="api-status-label">Conectado a EsquizoStudios</span>
           </div>
         </div>
 
-        <!-- VIEW: HOME (Welcome / No instance selected) -->
+        <!-- VIEW: HOME (Welcome / Continuar Jugando / No instance selected) -->
         <section id="panel-home" class="panel-screen active">
+          <!-- CONTINUAR JUGANDO SECTION -->
+          <div id="continue-playing-container" class="continue-playing-container" style="display: none;">
+            <div class="continue-playing-card">
+              <div class="continue-badge">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                CONTINUAR JUGANDO
+              </div>
+              <div class="continue-content">
+                <img id="continue-inst-logo" class="continue-logo" src="assets/default-instance.png" alt="Logo">
+                <div class="continue-meta">
+                  <h3 id="continue-inst-title">Nombre de la Instancia</h3>
+                  <div class="continue-tags">
+                    <span class="continue-tag" id="continue-inst-version">MC 1.20.1</span>
+                    <span class="continue-tag" id="continue-inst-loader">Fabric</span>
+                  </div>
+                </div>
+                <button class="btn btn-primary btn-large btn-continue-play" id="btn-continue-play" onclick="triggerPlayLastInstance()">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                    <polygon points="5 3 19 12 5 21 5 3"/>
+                  </svg>
+                  <span>JUGAR</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
           <div class="home-hero-content">
             <div class="hero-logo-box">
-              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="#a855f7"/>
-              </svg>
+              <img src="assets/esquizo.png" alt="EsquizoStudios" style="width: 76px; height: 76px; border-radius: 18px; object-fit: cover; box-shadow: 0 4px 20px var(--primary-glow);">
             </div>
             <h1 class="hero-title">EsquizoStudios <span>Events</span></h1>
             <p class="hero-desc">
@@ -349,7 +380,7 @@
           <div class="panel-header-row">
             <div>
               <h2>Galería de Capturas (F2)</h2>
-              <p>Capturas tomadas dentro de Minecraft durante los eventos.</p>
+              <p>Pasa el mouse sobre una captura para copiarla al portapapeles o eliminarla.</p>
             </div>
             <button class="btn btn-secondary" onclick="openScreenshotsInExplorer()">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
@@ -358,78 +389,178 @@
           </div>
 
           <div class="gallery-grid" id="gallery-grid">
-            <!-- Loaded via JS -->
+            <!-- Loaded via JS with hover copy/delete buttons -->
           </div>
         </section>
 
-        <!-- VIEW: SETTINGS -->
+        <!-- VIEW: SETTINGS (REORGANIZED IN SUB-SECTIONS) -->
         <section id="panel-settings" class="panel-screen">
           <div class="panel-header-row">
             <div>
               <h2>Ajustes del Launcher</h2>
-              <p>Configura el rendimiento, Java y tu vinculación de cuenta.</p>
+              <p>Personaliza el rendimiento, comportamiento y cuentas de EsquizoLauncher.</p>
             </div>
             <button class="btn btn-primary" onclick="saveLauncherSettings()">Guardar Ajustes</button>
           </div>
 
-          <div class="settings-grid">
-            <!-- RAM Allocation Slider -->
-            <div class="settings-card">
-              <h3>Asignación de Memoria RAM</h3>
-              <p class="settings-desc">Ajusta la cantidad máxima de memoria RAM dedicada a Minecraft.</p>
-              
-              <div class="ram-slider-row">
-                <input type="range" id="ram-slider" min="2048" max="16384" step="512" value="4096" oninput="updateRamSliderDisplay()">
-                <div class="ram-value-display"><strong id="ram-slider-value">4.0</strong> GB</div>
-              </div>
-              <small class="hint">Recomendado para eventos de EsquizoStudios: 4 GB o más.</small>
-            </div>
+          <!-- SUB-SECTIONS TABS -->
+          <div class="settings-subtabs">
+            <button class="settings-subtab-btn active" data-subtab="perf" onclick="switchSettingsSubtab('perf')">
+              ⚡ Rendimiento & Java
+            </button>
+            <button class="settings-subtab-btn" data-subtab="behavior" onclick="switchSettingsSubtab('behavior')">
+              🎮 Comportamiento
+            </button>
+            <button class="settings-subtab-btn" data-subtab="account" onclick="switchSettingsSubtab('account')">
+              👤 Cuenta & Discord
+            </button>
+            <button class="settings-subtab-btn" data-subtab="community" onclick="switchSettingsSubtab('community')">
+              💬 Comunidad
+            </button>
+          </div>
 
-            <!-- Java Runtime Selector -->
-            <div class="settings-card">
-              <h3>Entorno Java (JRE / JDK)</h3>
-              <p class="settings-desc">Selecciona la instalación de Java con la que se ejecutará el juego.</p>
-              <div class="java-select-row">
-                <select id="java-select">
-                  <option value="">Autodetectar automáticamente (Recomendado)</option>
-                </select>
-                <button class="btn btn-secondary" onclick="browseCustomJava()">Examinar...</button>
+          <div class="settings-subtab-content active" id="subtab-perf">
+            <div class="settings-grid">
+              <!-- RAM Allocation Slider -->
+              <div class="settings-card">
+                <div class="settings-card-header">
+                  <span class="card-icon">⚡</span>
+                  <div>
+                    <h3>Asignación de Memoria RAM</h3>
+                    <p class="settings-desc">Ajusta la cantidad máxima de memoria RAM dedicada a Minecraft.</p>
+                  </div>
+                </div>
+                
+                <div class="ram-slider-row">
+                  <input type="range" id="ram-slider" min="2048" max="16384" step="512" value="4096" oninput="updateRamSliderDisplay()">
+                  <div class="ram-value-display"><strong id="ram-slider-value">4.0</strong> GB</div>
+                </div>
+                <small class="hint">Recomendado para eventos de EsquizoStudios: 4 GB o más.</small>
+              </div>
+
+              <!-- Java Runtime Selector -->
+              <div class="settings-card">
+                <div class="settings-card-header">
+                  <span class="card-icon">☕</span>
+                  <div>
+                    <h3>Entorno Java (JRE / JDK)</h3>
+                    <p class="settings-desc">El launcher descargará automáticamente Java 8/17/21 portable si no se detecta uno en tu PC.</p>
+                  </div>
+                </div>
+                <div class="java-select-row">
+                  <select id="java-select">
+                    <option value="">Autodetectar / Descargar automáticamente (Recomendado)</option>
+                  </select>
+                  <button class="btn btn-secondary" onclick="browseCustomJava()">Examinar...</button>
+                </div>
               </div>
             </div>
+          </div>
 
-            <!-- Account & Discord Unlinking -->
-            <div class="settings-card">
-              <h3>Gestión de Cuenta & Discord</h3>
-              <div class="account-details-box">
-                <div class="account-row">
-                  <span>Usuario Actual:</span>
-                  <strong id="settings-username">-</strong>
-                </div>
-                <div class="account-row">
-                  <span>Tipo de Cuenta:</span>
-                  <span class="badge" id="settings-account-type">Offline</span>
-                </div>
-                <div class="account-row">
-                  <span>Discord Vinculado:</span>
-                  <span id="settings-discord-status">No vinculado</span>
+          <div class="settings-subtab-content" id="subtab-behavior">
+            <div class="settings-card" style="max-width: 650px;">
+              <div class="settings-card-header">
+                <span class="card-icon">🎮</span>
+                <div>
+                  <h3>Al Iniciar una Instancia</h3>
+                  <p class="settings-desc">Elige qué debe hacer la ventana de EsquizoLauncher mientras juegas.</p>
                 </div>
               </div>
-              <div style="margin-top: 14px;">
-                <button class="btn btn-secondary btn-sm" id="btn-unlink-discord" onclick="unlinkDiscordFromSettings()">
-                  Desvincular Cuenta de Discord
-                </button>
+
+              <div class="radio-options-list">
+                <label class="radio-option-card">
+                  <input type="radio" name="opt-action-on-play" value="keep" checked>
+                  <div class="radio-option-info">
+                    <strong>Mantener el launcher abierto</strong>
+                    <small>La ventana del launcher se mantiene en pantalla o detrás del juego.</small>
+                  </div>
+                </label>
+
+                <label class="radio-option-card">
+                  <input type="radio" name="opt-action-on-play" value="minimize">
+                  <div class="radio-option-info">
+                    <strong>Minimizar el launcher</strong>
+                    <small>Minimiza la ventana a la barra de tareas cuando Minecraft inicia.</small>
+                  </div>
+                </label>
+
+                <label class="radio-option-card">
+                  <input type="radio" name="opt-action-on-play" value="hide">
+                  <div class="radio-option-info">
+                    <strong>Ocultar el launcher mientras se juega</strong>
+                    <small>Oculta la ventana y la restaura automáticamente al cerrarse Minecraft.</small>
+                  </div>
+                </label>
               </div>
             </div>
+          </div>
 
-            <!-- About EsquizoStudios -->
-            <div class="settings-card">
-              <h3>Acerca de EsquizoLauncher</h3>
-              <p class="settings-desc">
-                Desarrollado exclusivamente por <strong>EsquizoStudios</strong>.<br>
-                Este software es propietario y <strong>NO es de código abierto</strong>.
-              </p>
-              <div class="copyright-notice">
-                EsquizoStudios &copy; 2026. Todos los derechos reservados.
+          <div class="settings-subtab-content" id="subtab-account">
+            <div class="settings-grid">
+              <div class="settings-card">
+                <div class="settings-card-header">
+                  <span class="card-icon">👤</span>
+                  <div>
+                    <h3>Perfil Activo</h3>
+                    <p class="settings-desc">Información del jugador vinculado.</p>
+                  </div>
+                </div>
+                <div class="account-details-box">
+                  <div class="account-row">
+                    <span>Usuario Actual:</span>
+                    <strong id="settings-username">-</strong>
+                  </div>
+                  <div class="account-row">
+                    <span>Tipo de Cuenta:</span>
+                    <span class="badge" id="settings-account-type">Offline</span>
+                  </div>
+                  <div class="account-row">
+                    <span>Discord Vinculado:</span>
+                    <span id="settings-discord-status">No vinculado</span>
+                  </div>
+                </div>
+                <div style="margin-top: 14px;">
+                  <button class="btn btn-secondary btn-sm" id="btn-unlink-discord" onclick="unlinkDiscordFromSettings()">
+                    Desvincular Cuenta de Discord
+                  </button>
+                </div>
+              </div>
+
+              <div class="settings-card">
+                <div class="settings-card-header">
+                  <span class="card-icon">🌐</span>
+                  <div>
+                    <h3>Servidor & Backend</h3>
+                    <p class="settings-desc">Punto de conexión a la API de EsquizoStudios.</p>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <input type="text" id="settings-api-url" placeholder="http://localhost:3001">
+                  <small>URL del servidor privado donde se validan instancias y Discord.</small>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="settings-subtab-content" id="subtab-community">
+            <div class="settings-card community-card">
+              <div class="community-banner">
+                <img src="assets/esquizo.png" alt="EsquizoStudios" style="width: 60px; height: 60px; border-radius: 14px;">
+                <div>
+                  <h3>Comunidad Oficial de EsquizoStudios</h3>
+                  <p>Únete a nuestro servidor de Discord para enterarte de los próximos torneos, avisos y códigos de eventos.</p>
+                </div>
+              </div>
+              <button class="btn btn-discord btn-large" style="margin-top: 16px;" onclick="openDiscordInvite()">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.929 1.793 8.18 1.793 12.061 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.893.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.028zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/>
+                </svg>
+                Unirse a discord.gg/VgxHfRkYPn
+              </button>
+
+              <div class="copyright-notice" style="margin-top: 24px;">
+                <strong>EsquizoLauncher v1.0.0</strong> &bull; EsquizoStudios &copy; 2026.<br>
+                Este software es propietario y privado. Prohibida su redistribución.
               </div>
             </div>
           </div>
@@ -503,13 +634,31 @@
     </div>
   </div>
 
-  <!-- MODAL: FULLSCREEN SCREENSHOT PREVIEW -->
+  <!-- MODAL: FULLSCREEN SCREENSHOT PREVIEW WITH ACTION TOOLBAR -->
   <div id="modal-screenshot-preview" class="modal modal-lightbox" onclick="closeModal('modal-screenshot-preview')">
     <div class="lightbox-content">
+      <div class="lightbox-toolbar" onclick="event.stopPropagation()">
+        <button class="btn btn-secondary btn-sm" id="btn-lb-copy" onclick="copyCurrentLightboxScreenshot()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+          Copiar Imagen
+        </button>
+        <button class="btn btn-secondary btn-sm" id="btn-lb-folder" onclick="showCurrentLightboxInFolder()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+          Ver en Carpeta
+        </button>
+        <button class="btn btn-danger btn-sm" id="btn-lb-delete" onclick="deleteCurrentLightboxScreenshot()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+          Borrar
+        </button>
+        <button class="btn btn-secondary btn-sm" onclick="closeModal('modal-screenshot-preview')">✕</button>
+      </div>
       <img id="lightbox-img" src="" alt="Captura">
       <div id="lightbox-caption" class="lightbox-caption"></div>
     </div>
   </div>
+
+  <!-- Toast Notification -->
+  <div id="app-toast" class="app-toast" style="display: none;"></div>
 
   <!-- Scripts -->
   <script src="js/sidebar.js"></script>

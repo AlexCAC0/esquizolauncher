@@ -16,10 +16,12 @@ const DEFAULT_STATE = {
   accounts: [],
   instances: [],
   selected_instance_id: null,
+  last_played_instance_id: null,
   settings: {
     ram_min: 2048,
     ram_max: 4096,
     java_path: '',
+    action_on_play: 'keep', // 'keep' | 'minimize' | 'hide'
     api_url: config.DEFAULT_API_URL
   }
 };
@@ -154,6 +156,20 @@ class Store {
 
   setSelectedInstanceId(id) {
     this.data.selected_instance_id = id;
+    this.save();
+  }
+
+  getLastPlayedInstanceId() {
+    return this.data.last_played_instance_id;
+  }
+
+  getLastPlayedInstance() {
+    if (!this.data.last_played_instance_id) return null;
+    return (this.data.instances || []).find(i => i.id === this.data.last_played_instance_id) || null;
+  }
+
+  setLastPlayedInstanceId(id) {
+    this.data.last_played_instance_id = id;
     this.save();
   }
 

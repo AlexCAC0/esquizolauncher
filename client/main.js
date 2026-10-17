@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain, dialog } = require('electron');
+const { app, BrowserWindow, ipcMain, dialog, shell } = require('electron');
 const path = require('path');
 const config = require('./src/config');
 const store = require('./src/store');
@@ -7,7 +7,14 @@ const offlineAuth = require('./src/auth/offline');
 const msAuth = require('./src/auth/microsoft');
 const { launchGame, isGameRunning } = require('./src/minecraft/launcher');
 const { findJavaInstallations } = require('./src/minecraft/java');
-const { getScreenshots, openScreenshotsFolder } = require('./src/gallery');
+const {
+  getScreenshots,
+  openScreenshotsFolder,
+  copyScreenshotToClipboard,
+  deleteScreenshot,
+  showScreenshotInFolder
+} = require('./src/gallery');
+const discordRpc = require('./src/discord-rpc');
 
 let mainWindow = null;
 
@@ -19,7 +26,7 @@ function createWindow() {
     minHeight: 620,
     frame: false,
     backgroundColor: '#090714',
-    icon: path.join(__dirname, 'renderer', 'assets', 'icon.png'),
+    icon: path.join(__dirname, 'renderer', 'assets', 'esquizo.png'),
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       contextIsolation: true,
@@ -39,6 +46,7 @@ function createWindow() {
 app.whenReady().then(() => {
   setupIpcHandlers();
   createWindow();
+  discordRpc.initRpc();
 
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) createWindow();
@@ -151,6 +159,10 @@ function setupIpcHandlers() {
       return { success: false, error: 'Debes iniciar sesión para jugar.' };
     }
 
+    // Save as last played instance
+    store.setLastPlayedInstanceId(instanceId);
+    const instance = store.getInstance(instanceId);
+
     try {
       await launchGame(
         instanceId,
@@ -159,15 +171,35 @@ function setupIpcHandlers() {
           if (mainWindow) {
             mainWindow.webContents.send('game:progress', progress);
           }
+          discordRpc.setDownloading(progress.message || 'Descargando assets');
         },
         (state, detail) => {
           if (mainWindow) {
             mainWindow.webContents.send('game:state', { state, detail });
           }
+
+          const settings = store.getSettings();
+          if (state === 'running') {
+            discordRpc.setPlaying(instance ? instance.name : instanceId, false, instance?.logo);
+
+            if (settings.action_on_play === 'minimize' && mainWindow) {
+              mainWindow.minimize();
+            } else if (settings.action_on_play === 'hide' && mainWindow) {
+              mainWindow.hide();
+            }
+          } else if (state === 'stopped' || state === 'error') {
+            discordRpc.setStandby();
+
+            if (settings.action_on_play === 'hide' && mainWindow) {
+              mainWindow.show();
+              mainWindow.focus();
+            }
+          }
         }
       );
       return { success: true };
     } catch (err) {
+      discordRpc.setStandby();
       return { success: false, error: err.message };
     }
   });
@@ -184,6 +216,30 @@ function setupIpcHandlers() {
   ipcMain.handle('gallery:open-folder', (event, instanceId) => {
     openScreenshotsFolder(instanceId);
     return true;
+  });
+
+  ipcMain.handle('gallery:copy', (event, filePath) => {
+    try {
+      return { success: copyScreenshotToClipboard(filePath) };
+    } catch (err) {
+      return { success: false, error: err.message };
+    }
+  });
+
+  ipcMain.handle('gallery:delete', (event, filePath) => {
+    try {
+      return { success: deleteScreenshot(filePath) };
+    } catch (err) {
+      return { success: false, error: err.message };
+    }
+  });
+
+  ipcMain.handle('gallery:show-in-folder', (event, filePath) => {
+    try {
+      return { success: showScreenshotInFolder(filePath) };
+    } catch (err) {
+      return { success: false, error: err.message };
+    }
   });
 
   // Settings
@@ -210,6 +266,13 @@ function setupIpcHandlers() {
       return res.filePaths[0];
     }
     return null;
+  });
+
+  ipcMain.handle('system:open-url', (event, url) => {
+    if (url) {
+      shell.openExternal(url);
+    }
+    return true;
   });
 
   // Window Controls

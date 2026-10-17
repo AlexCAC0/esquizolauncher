@@ -33,7 +33,8 @@ EsquizoLauncher/
 │   │   ├── config.js               # Rutas locales (%APPDATA%/.esquizolauncher), branding y API
 │   │   ├── store.js                # Gestor de persistencia atómica (cuentas, TOS, instancias)
 │   │   ├── api.js                  # Cliente HTTP Axios hacia el backend de EsquizoStudios
-│   │   ├── gallery.js              # Escaneo y gestión de capturas de pantalla tomadas con F2
+│   │   ├── discord-rpc.js          # Integración de Discord Rich Presence (RPC) con estados dinámicos
+│   │   ├── gallery.js              # Escaneo y gestión de capturas de pantalla tomadas con F2 (copiar/eliminar)
 │   │   ├── auth/
 │   │   │   ├── microsoft.js        # Flujo Device Code OAuth + Verificación de compra Minecraft Java
 │   │   │   └── offline.js          # Cuenta offline + vinculación obligatoria y única de Discord
@@ -243,8 +244,8 @@ Para generar el ejecutable instalable o portable para los jugadores:
 
 A continuación se listan ideas y mejoras sugeridas para expandir las capacidades de EsquizoLauncher y los eventos de EsquizoStudios:
 
-1. **Discord Rich Presence (RPC) Dinámico:**
-   - Mostrar en el perfil de Discord del jugador: *"Jugando Evento: [Nombre del Evento]"* con el tiempo transcurrido y la miniatura del logo del evento.
+1. **Discord Rich Presence (RPC) Dinámico:** *(✅ IMPLEMENTADO)*
+   - Muestra en el perfil de Discord: estado de inicio/standby, progreso de descargas de assets y estado jugando (singleplayer/multiplayer) con nombre de la instancia, logo y tiempo transcurrido.
 2. **Auto-Configuración de Simple Voice Chat:**
    - Detectar la presencia del mod de voz y sincronizar automáticamente los puertos, servidor de voz y teclas asignadas en `config/voicechat.json` según el evento.
 3. **Actualizador Silencioso en Segundo Plano (`electron-updater`):**
@@ -261,6 +262,8 @@ A continuación se listan ideas y mejoras sugeridas para expandir las capacidade
    - Servidor local de texturas para inyectar capas y cosméticos exclusivos de EsquizoStudios visibles para todos los usuarios que usen el launcher oficial.
 9. **Verificación de Integridad de Memoria / Anti-Cheat Básico:**
    - Comprobación de que no se hayan inyectado librerías `.dll` sospechosas en el proceso Java durante la partida.
+10. **Grabador de Replays / Clips Automático:**
+    - Integración de ReplayMod pre-configurado para renderizar los mejores momentos de los participantes del evento sin pérdida de rendimiento.
 
 ---
 
@@ -272,3 +275,12 @@ A continuación se listan ideas y mejoras sugeridas para expandir las capacidade
 | :--- | :--- | :--- | :--- |
 | **2026-10-16 20:00:00** | Antigravity AI | Todo el proyecto | Creación inicial de EsquizoLauncher (Cliente Electron + Panel Admin Express + Suite de pruebas). Implementación del flujo de onboarding con TOS obligatorios, login Microsoft Premium con chequeo de compra y login Offline con Discord. Motor Anti-Leak con borrado de mods al salir. Subida inicial a GitHub (`https://github.com/AlexCAC0/esquizolauncher`). |
 | **2026-10-16 20:53:00** | Antigravity AI | `context.md` | Creación del archivo de contexto técnico maestro exhaustivo con documentación de arquitectura, seguridad, configuración pendiente, protocolo de changelog y lista de ideas futuras. |
+| **2026-10-16 21:12:00** | Antigravity AI | `client/package.json`, `client/src/minecraft/launcher.js`, `client/src/minecraft/downloader.js`, `client/src/minecraft/java.js`, `test_system.js`, `context.md` | Implementación completa de la función de apertura real de Minecraft con la Opción A: integración de `minecraft-launcher-core` (MCLC). Se implementó la descarga automática y verificación SHA1 del cliente base de Mojang (`ensureVanillaJar`), generación automática de perfiles de Fabric Loader desde la API oficial (`prepareFabricProfile`), resolución dinámica de Classpath/Natives/Assets, canalización de eventos de progreso hacia la UI, detección robusta de Java 17/21 con mensajes explicativos, preservación intacta del protocolo Anti-Leak (`cleanInstanceMods`), y nuevo caso de prueba en `test_system.js` validado al 100%. |
+| **2026-10-16 21:23:00** | Antigravity AI | `client/src/config.js`, `client/src/minecraft/java.js`, `client/src/minecraft/launcher.js`, `test_system.js`, `context.md` | Implementación del sistema inteligente de detección y descarga automática de Java: determina dinámicamente si la versión de Minecraft requiere Java 8 (<=1.16.5), Java 17 (1.17-1.20.4) o Java 21 (1.20.5+ y 1.21+). Si la máquina del jugador no tiene la versión correspondiente instalada, descarga automáticamente un runtime JRE oficial portátil de Eclipse Temurin (Adoptium) en `.esquizolauncher/runtimes/java-<ver>/`, lo descomprime y lo configura de inmediato con seguimiento de progreso en la UI. Añadido el Test 6 en `test_system.js` superado al 100%. |
+| **2026-10-16 22:09:00** | Antigravity AI | `client/src/gallery.js`, `client/src/minecraft/downloader.js`, `client/src/minecraft/launcher.js`, `test_system.js`, `context.md` | Centralización automática de capturas de pantalla tomadas con F2 en Minecraft hacia la carpeta `screenshots` del launcher (`%APPDATA%/.esquizolauncher/screenshots`). Se implementó `linkScreenshotsFolder` utilizando Junctions de NTFS en Windows al preparar cada instancia, vinculando de forma transparente `instances/<id>/screenshots` con la carpeta central sin necesidad de mods. Se añadió sincronizador de respaldo en `launcher.on('close')`, soporte canónico en `getScreenshots()` para evitar duplicados y el Test 7 en `test_system.js` validado al 100%. |
+| **2026-10-16 22:26:00** | Antigravity AI | `client/src/minecraft/downloader.js`, `client/src/minecraft/launcher.js`, `context.md` | Corrección del problema de audio inaudible / mudo en Minecraft. Se identificó en `latest.log` que Minecraft arrojaba `[Render thread/ERROR]: Can't open the resource index file: .../assets/indexes/1.20.1.json`, lo que provocaba que el SoundManager no cargara los archivos de sonido `.ogg`. Se corrigió implementando la descarga y replicación automática del índice de recursos para versiones vanilla y cargadores Fabric en `downloader.js`, y asegurando la ruta canónica `assetRoot` en los argumentos de inicio de `launcher.js`. |
+| **2026-10-16 23:42:00** | Antigravity AI | `client/package.json`, `client/src/discord-rpc.js`, `client/src/store.js`, `client/src/gallery.js`, `client/preload.js`, `client/main.js`, `client/renderer/index.html`, `client/renderer/css/components.css`, `client/renderer/js/app.js`, `client/renderer/js/main-view.js`, `client/renderer/js/gallery-view.js`, `client/renderer/js/settings-view.js`, `client/renderer/js/sidebar.js`, `test_system.js`, `context.md`, `esquizo.png` | **Actualización integral de experiencia de usuario y presencia digital:**<br>1. **Continuar Jugando:** Nueva tarjeta destacada en la pantalla de inicio con la última instancia jugada (o primera disponible) mostrando carátula, versión, modloader y botón de inicio directo.<br>2. **Saludo Dinámico con Avatar:** Inclusión de la cabeza de la skin del jugador (`greeting-avatar-head`) junto a la hora del día en color blanco puro (`#ffffff`) y el nombre del jugador destacado en color violeta vibrante (`#c084fc`).<br>3. **Animaciones Fluidas de Pestañas:** Transiciones suaves `@keyframes panelFadeSlide` entre pantallas, dotando de dinamismo y vida al cliente.<br>4. **Integración con Discord RPC:** Integración completa de presencia enriquecida en Discord (Standby en inicio, Descargando assets, y Jugando Singleplayer/Multiplayer con logotipo de la instancia y duración de sesión).<br>5. **Acciones en Galería F2:** Botones interactivos al hacer hover sobre cualquier captura para copiar la imagen directamente al portapapeles (`clipboard.writeImage`) o eliminarla de disco con confirmación; toolbar funcional análoga en el visor modal a pantalla completa.<br>6. **Ajustes Reorganizados en Sub-secciones & Acción al Jugar:** Organización por pestañas (*Rendimiento & Java*, *Comportamiento*, *Cuenta & Discord*, *Comunidad*) y nueva configuración para mantener abierto, minimizar u ocultar y restaurar la ventana al jugar.<br>7. **Acceso Oficial a Discord:** Botones de invitación directa a `discord.gg/VgxHfRkYPn` en la barra lateral y en la pestaña de comunidad.<br>8. **Logo Oficial:** Adopción del archivo `esquizo.png` oficial en todas las vistas y ejecutables. Test 8 implementado y aprobado al 100%. |
+
+
+
+

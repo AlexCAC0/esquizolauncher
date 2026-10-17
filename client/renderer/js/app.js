@@ -57,8 +57,8 @@ function enterMainMenu(storeData) {
 
   const account = storeData.current_account;
 
-  // Initialize Dynamic Greeting based on PC Clock & Username
-  updateDynamicGreeting(account?.username);
+  // Initialize Dynamic Greeting based on PC Clock & Username & Avatar
+  updateDynamicGreeting(account?.username, account?.skinUrl);
 
   // Render Sidebar
   renderSidebar(storeData);
@@ -70,4 +70,17 @@ function enterMainMenu(storeData) {
     setActiveSidebarNav('home');
     showHomeView();
   }
+}
+
+// Global Toast Notification Helper
+let toastTimeout = null;
+function showToast(message) {
+  const toast = document.getElementById('app-toast');
+  if (!toast) return;
+  toast.textContent = message;
+  toast.classList.add('show');
+  if (toastTimeout) clearTimeout(toastTimeout);
+  toastTimeout = setTimeout(() => {
+    toast.classList.remove('show');
+  }, 2800);
 }

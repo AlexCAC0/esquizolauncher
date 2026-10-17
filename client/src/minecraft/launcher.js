@@ -1,11 +1,12 @@
-const { spawn } = require('child_process');
 const path = require('path');
 const fs = require('fs');
+const { Client } = require('minecraft-launcher-core');
 const config = require('../config');
 const store = require('../store');
-const { resolveJavaPath } = require('./java');
+const { ensureJavaRuntime, resolveJavaPath } = require('./java');
 const { prepareInstance } = require('./downloader');
 const { cleanInstanceMods } = require('./cleaner');
+const { syncScreenshots } = require('../gallery');
 
 let activeMinecraftProcess = null;
 let activeInstanceId = null;
@@ -24,7 +25,7 @@ process.on('SIGINT', () => {
 });
 
 /**
- * Launches an instance of Minecraft with full anti-leak mod protection.
+ * Launches an instance of Minecraft with full anti-leak mod protection and real file execution.
  *
  * @param {string} instanceId - Unique private ID of the instance
  * @param {Object} account - Current user account object
@@ -33,104 +34,123 @@ process.on('SIGINT', () => {
  */
 async function launchGame(instanceId, account, onProgress = () => {}, onStateChange = () => {}) {
   if (activeMinecraftProcess) {
-    throw new Error('Ya hay una instancia de Minecraft ejecutándose.');
+    throw new Error('Ya hay una instancia de Minecraft ejecutándose en este momento.');
   }
 
   activeInstanceId = instanceId;
 
   try {
-    // 1. Prepare and update files
+    // 1. Prepare and update files (overrides, mods, vanilla jar, and fabric loader profile)
     const prepData = await prepareInstance(instanceId, onProgress);
     const instanceDir = prepData.instanceDir;
 
-    // 2. Resolve Java runtime
-    onProgress({ step: 'java', percent: 95, message: 'Detectando entorno Java...' });
-    const javaPath = resolveJavaPath(17);
+    // 2. Automatically detect and ensure compatible Java runtime (downloading if missing)
+    const javaPath = await ensureJavaRuntime(prepData.mcVersion, onProgress);
 
-    // 3. Prepare JVM & Minecraft Arguments
+    // 3. Resolve RAM allocations
     const settings = store.getSettings();
     const ramMin = settings.ram_min || 2048;
     const ramMax = settings.ram_max || 4096;
 
-    const jvmArgs = [
-      `-Xms${ramMin}M`,
-      `-Xmx${ramMax}M`,
-      '-XX:+UnlockExperimentalVMOptions',
-      '-XX:+UseG1GC',
-      '-XX:G1NewSizePercent=20',
-      '-XX:G1ReservePercent=20',
-      '-XX:MaxGCPauseMillis=50',
-      '-XX:G1HeapRegionSize=32M',
-      `-Djava.library.path=${path.join(instanceDir, 'natives')}`,
-      `-Dminecraft.launcher.brand=EsquizoLauncher`,
-      `-Dminecraft.launcher.version=${config.VERSION}`
-    ];
+    // 4. Initialize Minecraft Launcher Core
+    const launcher = new Client();
 
-    const gameArgs = [
-      '--username', account.username,
-      '--version', `Esquizo-${instanceId}`,
-      '--gameDir', instanceDir,
-      '--assetsDir', config.PATHS.ASSETS,
-      '--assetIndex', prepData.mcVersion,
-      '--uuid', account.uuid,
-      '--accessToken', account.token || 'offline_token',
-      '--userType', account.type === 'microsoft' ? 'msa' : 'legacy',
-      '--versionType', 'release'
-    ];
-
-    // Dummy/main class for launching. In a full production bundle, this uses net.fabricmc.loader.impl.launch.knot.KnotClient or net.minecraft.client.main.Main
-    // For test execution or demo run, we craft the full launch command
-    const classpath = [
-      path.join(instanceDir, 'bin', '*'),
-      path.join(config.PATHS.LIBRARIES, '*')
-    ].join(path.delimiter);
-
-    const fullArgs = [
-      ...jvmArgs,
-      '-cp', classpath,
-      'net.fabricmc.loader.impl.launch.knot.KnotClient',
-      ...gameArgs
-    ];
-
-    onProgress({ step: 'launching', percent: 100, message: '¡Iniciando Minecraft...' });
-    onStateChange('launching', { javaPath, instanceDir });
-
-    console.log(`[Launcher] Iniciando Minecraft con: ${javaPath}`);
-    console.log(`[Launcher] GameDir: ${instanceDir}`);
-
-    const child = spawn(javaPath, fullArgs, {
-      cwd: instanceDir,
-      detached: false,
-      stdio: ['pipe', 'pipe', 'pipe']
+    launcher.on('progress', (e) => {
+      let pct = 75;
+      if (e.total > 0) {
+        pct = Math.min(95, Math.round(75 + (e.task / e.total) * 20));
+      }
+      const labels = {
+        'assets': 'Descargando recursos de Minecraft',
+        'classes': 'Descargando librerías oficiales',
+        'classes-custom': 'Descargando librerías de Fabric',
+        'natives': 'Extrayendo componentes gráficos nativos'
+      };
+      const label = labels[e.type] || `Descargando componentes (${e.type})`;
+      onProgress({
+        step: e.type,
+        percent: pct,
+        message: `${label} (${e.task}/${e.total})...`
+      });
     });
 
-    activeMinecraftProcess = child;
-    onStateChange('running', { pid: child.pid });
-
-    child.stdout.on('data', data => {
-      const line = data.toString();
-      console.log(`[Minecraft] ${line.trim()}`);
+    launcher.on('data', (data) => {
+      const line = data.toString().trim();
+      if (line) console.log(`[Minecraft] ${line}`);
     });
 
-    child.stderr.on('data', data => {
-      const line = data.toString();
-      console.error(`[Minecraft Error] ${line.trim()}`);
+    launcher.on('debug', (debug) => {
+      console.log(`[Launcher Debug] ${debug}`);
     });
 
-    // CRITICAL ANTI-LEAK: Clean mods immediately upon process termination
-    child.on('exit', (code, signal) => {
-      console.log(`[Launcher] Minecraft finalizado (código: ${code}, señal: ${signal}).`);
+    launcher.on('close', (code) => {
+      console.log(`[Launcher] Minecraft finalizado (código de salida: ${code}).`);
       console.log(`[Launcher] Ejecutando borrado seguro de mods para proteger los assets de EsquizoStudios...`);
 
-      // DELETE MODS IMMEDIATELY AND SILENTLY
+      // DELETE MODS IMMEDIATELY AND SILENTLY (ANTI-LEAK PROTOCOL)
       cleanInstanceMods(instanceId);
+
+      // Ensure any screenshots are synced to central gallery
+      syncScreenshots(instanceDir);
 
       activeMinecraftProcess = null;
       activeInstanceId = null;
-      onStateChange('stopped', { code, signal });
+      onStateChange('stopped', { code });
     });
 
-    child.on('error', err => {
+    const mclcOptions = {
+      authorization: {
+        access_token: account.token || 'offline_token',
+        client_token: account.uuid || '00000000-0000-0000-0000-000000000000',
+        uuid: account.uuid || '00000000-0000-0000-0000-000000000000',
+        name: account.username,
+        user_properties: '{}',
+        meta: {
+          type: account.type === 'microsoft' ? 'msa' : 'mojang'
+        }
+      },
+      root: config.PATHS.ROOT,
+      javaPath: javaPath,
+      version: {
+        number: prepData.mcVersion,
+        type: 'release',
+        custom: prepData.fabricVersionId || undefined
+      },
+      memory: {
+        min: `${ramMin}M`,
+        max: `${ramMax}M`
+      },
+      overrides: {
+        detached: false,
+        gameDirectory: instanceDir,
+        cwd: instanceDir,
+        assetIndex: prepData.mcVersion,
+        assetRoot: config.PATHS.ASSETS,
+        minecraftJar: path.join(config.PATHS.ROOT, 'versions', prepData.mcVersion, `${prepData.mcVersion}.jar`)
+      },
+      customArgs: [
+        `-Dminecraft.launcher.brand=${config.APP_TITLE}`,
+        `-Dminecraft.launcher.version=${config.VERSION}`
+      ]
+    };
+
+    onProgress({ step: 'launching', percent: 98, message: '¡Iniciando ventana de Minecraft!' });
+    onStateChange('launching', { javaPath, instanceDir });
+
+    console.log(`[Launcher] Iniciando Minecraft con runtime: ${javaPath}`);
+    console.log(`[Launcher] Carpeta de instancia: ${instanceDir}`);
+
+    const proc = await launcher.launch(mclcOptions);
+
+    if (!proc) {
+      throw new Error('No se pudo iniciar el proceso de Minecraft. Verifica que la versión de Java sea compatible.');
+    }
+
+    activeMinecraftProcess = proc;
+    onStateChange('running', { pid: proc.pid });
+    onProgress({ step: 'running', percent: 100, message: '¡Minecraft en ejecución!' });
+
+    proc.on('error', (err) => {
       console.error(`[Launcher] Error del proceso de Minecraft:`, err.message);
 
       // Clean mods in case of failure as well
@@ -141,9 +161,9 @@ async function launchGame(instanceId, account, onProgress = () => {}, onStateCha
       onStateChange('error', { error: err.message });
     });
 
-    return { pid: child.pid };
+    return { pid: proc.pid };
   } catch (err) {
-    // If any error occurs prior to launch, ensure no leftover leaked files
+    // If any error occurs prior to launch, ensure no leaked files
     cleanInstanceMods(instanceId);
     activeMinecraftProcess = null;
     activeInstanceId = null;

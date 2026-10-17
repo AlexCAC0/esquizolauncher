@@ -35,12 +35,16 @@ contextBridge.exposeInMainWorld('api', {
   // Gallery
   getScreenshots: (instanceId) => ipcRenderer.invoke('gallery:get', instanceId),
   openScreenshotsFolder: (instanceId) => ipcRenderer.invoke('gallery:open-folder', instanceId),
+  copyScreenshot: (filePath) => ipcRenderer.invoke('gallery:copy', filePath),
+  deleteScreenshot: (filePath) => ipcRenderer.invoke('gallery:delete', filePath),
+  showScreenshotInFolder: (filePath) => ipcRenderer.invoke('gallery:show-in-folder', filePath),
 
   // Settings & System
   getSettings: () => ipcRenderer.invoke('settings:get'),
   updateSettings: (settings) => ipcRenderer.invoke('settings:update', settings),
   getJavaList: () => ipcRenderer.invoke('system:get-javas'),
   browseJavaPath: () => ipcRenderer.invoke('system:browse-java'),
+  openExternalUrl: (url) => ipcRenderer.invoke('system:open-url', url),
 
   // Window Controls
   minimizeWindow: () => ipcRenderer.send('window:minimize'),

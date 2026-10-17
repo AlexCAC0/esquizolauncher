@@ -1,27 +1,74 @@
 let currentSelectedInstance = null;
+let lastContinueInstance = null;
 
-function updateDynamicGreeting(username) {
+function updateDynamicGreeting(username, skinUrl) {
   const now = new Date();
   const hour = now.getHours();
-  let greetingPrefix = 'Buenos Días';
+  let greetingPrefix = '¡Buenos Días,';
 
   if (hour >= 13 && hour < 20) {
-    greetingPrefix = 'Buenas Tardes';
+    greetingPrefix = '¡Buenas Tardes,';
   } else if (hour >= 20 || hour < 6) {
-    greetingPrefix = 'Buenas Noches';
+    greetingPrefix = '¡Buenas Noches,';
   }
 
-  const greetingEl = document.getElementById('dynamic-greeting');
-  greetingEl.textContent = `¡${greetingPrefix}, ${username || 'Jugador'}!`;
+  const timeEl = document.getElementById('greeting-time-text');
+  const nickEl = document.getElementById('greeting-player-nick');
+  const headEl = document.getElementById('greeting-avatar-head');
+
+  if (timeEl) timeEl.textContent = greetingPrefix;
+  if (nickEl) nickEl.textContent = username || 'Jugador';
+  if (headEl) {
+    headEl.src = skinUrl || `https://minotar.net/avatar/${username || 'Steve'}/64.png`;
+  }
 }
 
-function showHomeView() {
+async function showHomeView() {
   document.querySelectorAll('.panel-screen').forEach(p => p.classList.remove('active'));
   document.getElementById('panel-home').classList.add('active');
 
   // Reset wallpaper to default
   const backdrop = document.getElementById('wallpaper-backdrop');
   backdrop.style.backgroundImage = 'radial-gradient(circle at 70% 30%, #311b92 0%, #07050e 75%)';
+
+  // Load "Continuar Jugando" with last played instance
+  try {
+    const storeData = await window.api.getStore();
+    const instances = storeData.instances || [];
+    const lastId = storeData.last_played_instance_id;
+    let targetInst = instances.find(i => i.id === lastId);
+    if (!targetInst && instances.length > 0) {
+      targetInst = instances[0];
+    }
+
+    const container = document.getElementById('continue-playing-container');
+    if (targetInst && container) {
+      lastContinueInstance = targetInst;
+      const apiUrl = storeData.settings?.api_url || 'http://localhost:3001';
+      document.getElementById('continue-inst-title').textContent = targetInst.name || targetInst.id;
+      document.getElementById('continue-inst-version').textContent = `MC ${targetInst.mc_version || '1.20.1'}`;
+      document.getElementById('continue-inst-loader').textContent = (targetInst.loader?.type || 'Fabric').toUpperCase();
+
+      const logoEl = document.getElementById('continue-inst-logo');
+      if (targetInst.logo) {
+        logoEl.src = `${apiUrl}${targetInst.logo}`;
+      } else {
+        logoEl.src = 'assets/default-instance.png';
+      }
+      container.style.display = 'block';
+    } else if (container) {
+      container.style.display = 'none';
+      lastContinueInstance = null;
+    }
+  } catch (err) {
+    console.warn('Error loading continue playing instance:', err);
+  }
+}
+
+async function triggerPlayLastInstance() {
+  if (!lastContinueInstance) return;
+  await selectInstance(lastContinueInstance.id);
+  triggerPlayInstance();
 }
 
 async function showInstanceView(instanceId) {

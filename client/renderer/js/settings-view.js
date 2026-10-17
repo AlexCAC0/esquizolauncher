@@ -12,7 +12,16 @@ async function showSettingsView() {
   slider.value = ramMax;
   updateRamSliderDisplay();
 
-  // 2. Account Details
+  // 2. Action on Play Radio
+  const actionOnPlay = settings.action_on_play || 'keep';
+  const radio = document.querySelector(`input[name="opt-action-on-play"][value="${actionOnPlay}"]`);
+  if (radio) radio.checked = true;
+
+  // 3. API URL
+  const apiInput = document.getElementById('settings-api-url');
+  if (apiInput) apiInput.value = settings.api_url || 'http://localhost:3001';
+
+  // 4. Account Details
   if (currentAccount) {
     document.getElementById('settings-username').textContent = currentAccount.username;
     document.getElementById('settings-account-type').textContent = currentAccount.type === 'microsoft' ? 'Microsoft Premium' : 'Offline';
@@ -31,8 +40,17 @@ async function showSettingsView() {
     }
   }
 
-  // 3. Load Java List
+  // 5. Load Java List
   loadJavaInstallations(settings.java_path);
+}
+
+function switchSettingsSubtab(tabName) {
+  document.querySelectorAll('.settings-subtab-btn').forEach(b => {
+    b.classList.toggle('active', b.getAttribute('data-subtab') === tabName);
+  });
+  document.querySelectorAll('.settings-subtab-content').forEach(c => {
+    c.classList.toggle('active', c.id === `subtab-${tabName}`);
+  });
 }
 
 function updateRamSliderDisplay() {
@@ -43,7 +61,7 @@ function updateRamSliderDisplay() {
 
 async function loadJavaInstallations(selectedJavaPath = '') {
   const select = document.getElementById('java-select');
-  select.innerHTML = '<option value="">Autodetectar automáticamente (Recomendado)</option>';
+  select.innerHTML = '<option value="">Autodetectar / Descargar automáticamente (Recomendado)</option>';
 
   try {
     const list = await window.api.getJavaList();
@@ -76,13 +94,29 @@ async function browseCustomJava() {
 async function saveLauncherSettings() {
   const ramMax = parseInt(document.getElementById('ram-slider').value, 10);
   const javaPath = document.getElementById('java-select').value;
+  
+  const actionRadio = document.querySelector('input[name="opt-action-on-play"]:checked');
+  const actionOnPlay = actionRadio ? actionRadio.value : 'keep';
+
+  const apiInput = document.getElementById('settings-api-url');
+  const apiUrl = apiInput ? apiInput.value.trim() : 'http://localhost:3001';
 
   await window.api.updateSettings({
     ram_max: ramMax,
-    java_path: javaPath
+    java_path: javaPath,
+    action_on_play: actionOnPlay,
+    api_url: apiUrl
   });
 
-  alert('Ajustes guardados correctamente.');
+  if (typeof showToast === 'function') {
+    showToast('✅ Ajustes guardados correctamente');
+  } else {
+    alert('Ajustes guardados correctamente.');
+  }
+}
+
+function openDiscordInvite() {
+  window.api.openExternalUrl('https://discord.gg/VgxHfRkYPn');
 }
 
 async function unlinkDiscordFromSettings() {
@@ -96,7 +130,11 @@ async function unlinkDiscordFromSettings() {
 
   const res = await window.api.unlinkDiscord(acc.username);
   if (res.success) {
-    alert('Cuenta de Discord desvinculada exitosamente.');
+    if (typeof showToast === 'function') {
+      showToast('Discord desvinculado exitosamente');
+    } else {
+      alert('Cuenta de Discord desvinculada exitosamente.');
+    }
     showSettingsView();
   } else {
     alert(`Error: ${res.error || 'No se pudo desvincular Discord.'}`);

@@ -15,7 +15,9 @@ yarn-error.log*
 # Server Dynamic Data & Uploads
 server/data/tmp/
 server/data/database.json*
-server/public/uploads/instances/*/mods/
+server/public/uploads/instances/
+server/public/uploads/*
+!server/public/uploads/.gitkeep
 
 # Reference Folder (Contains large binary Events Client.exe > 200MB)
 referencia/

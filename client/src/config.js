@@ -25,6 +25,7 @@ module.exports = {
     ASSETS: path.join(LAUNCHER_DIR, 'assets'),
     LIBRARIES: path.join(LAUNCHER_DIR, 'libraries'),
     VERSIONS: path.join(LAUNCHER_DIR, 'versions'),
+    RUNTIMES: path.join(LAUNCHER_DIR, 'runtimes'),
     SCREENSHOTS_COMMON: path.join(LAUNCHER_DIR, 'screenshots'),
     DATA: path.join(LAUNCHER_DIR, 'launcher-data.json')
   }

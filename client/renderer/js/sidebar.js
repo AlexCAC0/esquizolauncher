@@ -61,6 +61,14 @@ function setupSidebarEvents() {
     openAccountManagementModal();
   });
 
+  // Official Studio Discord Button
+  const discordSidebarBtn = document.getElementById('btn-sidebar-discord');
+  if (discordSidebarBtn) {
+    discordSidebarBtn.addEventListener('click', () => {
+      openDiscordInvite();
+    });
+  }
+
   // Settings Gear
   document.getElementById('btn-settings').addEventListener('click', () => {
     setActiveSidebarNav('settings');
