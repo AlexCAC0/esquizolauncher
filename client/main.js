@@ -122,6 +122,24 @@ function setupIpcHandlers() {
     return true;
   });
 
+  ipcMain.handle('auth:discord-client-start', async () => {
+    try {
+      const res = await api.startDiscordClientAuth();
+      return res;
+    } catch (err) {
+      return { success: false, error: err.message };
+    }
+  });
+
+  ipcMain.handle('auth:discord-client-poll', async (event, sessionId) => {
+    try {
+      const res = await api.pollDiscordClientAuth(sessionId);
+      return res;
+    } catch (err) {
+      return { success: false, error: err.message };
+    }
+  });
+
   ipcMain.handle('auth:switch-account', (event, account) => {
     store.setCurrentAccount(account);
     return true;

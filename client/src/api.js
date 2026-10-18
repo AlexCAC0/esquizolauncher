@@ -55,6 +55,18 @@ async function fetchInstanceManifest(instanceId) {
   return res.data;
 }
 
+async function startDiscordClientAuth() {
+  const url = `${getBaseUrl()}/auth/discord/client-start`;
+  const res = await axios.get(url, { timeout: 6000 });
+  return res.data;
+}
+
+async function pollDiscordClientAuth(sessionId) {
+  const url = `${getBaseUrl()}/auth/discord/client-result?session=${encodeURIComponent(sessionId)}`;
+  const res = await axios.get(url, { timeout: 6000 });
+  return res.data;
+}
+
 module.exports = {
   getBaseUrl,
   fetchStatus,
@@ -63,5 +75,7 @@ module.exports = {
   loginMicrosoft,
   unlinkDiscord,
   claimInstance,
-  fetchInstanceManifest
+  fetchInstanceManifest,
+  startDiscordClientAuth,
+  pollDiscordClientAuth
 };

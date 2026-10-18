@@ -63,6 +63,96 @@ function switchLoginTab(tab) {
   document.getElementById('tab-login-microsoft').classList.toggle('active', tab === 'microsoft');
 }
 
+// DISCORD OAUTH FLOW (Client)
+let isDiscordPolling = false;
+
+async function startDiscordOAuthFlow() {
+  const errBox = document.getElementById('offline-login-error');
+  errBox.style.display = 'none';
+
+  const btn = document.getElementById('btn-oauth-discord');
+  const btnLabel = document.getElementById('btn-oauth-discord-label');
+  btn.disabled = true;
+  btnLabel.textContent = 'Abriendo navegador...';
+
+  try {
+    const res = await window.api.startDiscordOAuth();
+    if (!res.success) {
+      throw new Error(res.error || 'No se pudo iniciar el proceso de Discord');
+    }
+
+    // Open Discord OAuth URL in user's default browser
+    let targetUrl = res.url;
+    if (res.isDev) {
+      const storeData = await window.api.getStore();
+      const apiUrl = storeData.settings?.api_url || 'http://localhost:3001';
+      targetUrl = `${apiUrl}${res.url}`;
+    }
+
+    await window.api.openExternalUrl(targetUrl);
+    btnLabel.textContent = 'Esperando autorización en Discord...';
+
+    // Start polling in background
+    pollDiscordOAuthResult(res.sessionId);
+  } catch (err) {
+    btn.disabled = false;
+    btnLabel.textContent = 'Conectar con Discord';
+    errBox.textContent = err.message || 'Error al conectar con Discord.';
+    errBox.style.display = 'block';
+  }
+}
+
+async function pollDiscordOAuthResult(sessionId) {
+  const errBox = document.getElementById('offline-login-error');
+  const btn = document.getElementById('btn-oauth-discord');
+  const btnLabel = document.getElementById('btn-oauth-discord-label');
+  const statusBox = document.getElementById('discord-oauth-status');
+
+  const startTime = Date.now();
+  const maxWait = 120 * 1000; // 2 minutes
+
+  const check = async () => {
+    if (Date.now() - startTime > maxWait) {
+      btn.disabled = false;
+      btnLabel.textContent = 'Reintentar conexión con Discord';
+      errBox.textContent = 'El tiempo de espera para vincular Discord expiró.';
+      errBox.style.display = 'block';
+      return;
+    }
+
+    try {
+      const res = await window.api.pollDiscordOAuth(sessionId);
+      if (res.status === 'completed' && res.user) {
+        // Connected!
+        document.getElementById('offline-discord-id').value = res.user.id;
+        document.getElementById('offline-discord-user').value = res.user.username;
+
+        document.getElementById('discord-linked-name').textContent = `@${res.user.username}`;
+        document.getElementById('discord-linked-id').textContent = res.user.id;
+        statusBox.style.display = 'flex';
+
+        btn.style.display = 'none';
+        return;
+      }
+
+      if (res.status === 'error') {
+        btn.disabled = false;
+        btnLabel.textContent = 'Conectar con Discord';
+        errBox.textContent = res.error || 'Error al vincular Discord.';
+        errBox.style.display = 'block';
+        return;
+      }
+
+      // Still pending -> poll again in 1.5s
+      setTimeout(check, 1500);
+    } catch (err) {
+      setTimeout(check, 2000);
+    }
+  };
+
+  setTimeout(check, 1000);
+}
+
 // OFFLINE LOGIN
 async function handleOfflineLoginSubmit(e) {
   e.preventDefault();
@@ -72,6 +162,12 @@ async function handleOfflineLoginSubmit(e) {
 
   const errBox = document.getElementById('offline-login-error');
   errBox.style.display = 'none';
+
+  if (!discord_id) {
+    errBox.textContent = 'Debes presionar "Conectar con Discord" antes de ingresar.';
+    errBox.style.display = 'block';
+    return;
+  }
 
   const btn = document.getElementById('btn-submit-offline');
   btn.disabled = true;

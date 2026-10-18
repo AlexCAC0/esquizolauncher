@@ -9,6 +9,8 @@ contextBridge.exposeInMainWorld('api', {
   loginOffline: (data) => ipcRenderer.invoke('auth:login-offline', data),
   startMicrosoftDevice: () => ipcRenderer.invoke('auth:start-microsoft-device'),
   pollMicrosoftDevice: (deviceCode, interval) => ipcRenderer.invoke('auth:poll-microsoft-device', deviceCode, interval),
+  startDiscordOAuth: () => ipcRenderer.invoke('auth:discord-client-start'),
+  pollDiscordOAuth: (sessionId) => ipcRenderer.invoke('auth:discord-client-poll', sessionId),
   unlinkDiscord: (username) => ipcRenderer.invoke('auth:unlink-discord', username),
   logout: () => ipcRenderer.invoke('auth:logout'),
   switchAccount: (account) => ipcRenderer.invoke('auth:switch-account', account),

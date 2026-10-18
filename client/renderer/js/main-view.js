@@ -179,3 +179,27 @@ function setupGameEventListeners() {
     }
   });
 }
+
+// REMOVE CURRENT INSTANCE
+async function removeCurrentInstance() {
+  if (!currentSelectedInstance) return;
+
+  const instName = currentSelectedInstance.name || currentSelectedInstance.id;
+  if (!confirm(`¿Estás seguro de que deseas eliminar la instancia "${instName}" de tu launcher?`)) {
+    return;
+  }
+
+  try {
+    await window.api.removeInstance(currentSelectedInstance.id);
+    currentSelectedInstance = null;
+
+    // Reload sidebar and return to home view
+    if (typeof loadSidebarInstances === 'function') {
+      await loadSidebarInstances();
+    }
+    showHomeView();
+    showAppToast(`Instancia "${instName}" eliminada.`);
+  } catch (err) {
+    alert(`Error al eliminar instancia: ${err.message}`);
+  }
+}
