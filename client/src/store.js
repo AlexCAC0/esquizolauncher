@@ -37,10 +37,15 @@ class Store {
       if (fs.existsSync(config.PATHS.DATA)) {
         const raw = fs.readFileSync(config.PATHS.DATA, 'utf-8');
         const parsed = JSON.parse(raw);
+        const loadedSettings = { ...DEFAULT_STATE.settings, ...(parsed.settings || {}) };
+        // If settings was previously saved with localhost, upgrade it to config.DEFAULT_API_URL
+        if (!loadedSettings.api_url || loadedSettings.api_url.includes('localhost') || loadedSettings.api_url.includes('127.0.0.1')) {
+          loadedSettings.api_url = config.DEFAULT_API_URL;
+        }
         return {
           ...DEFAULT_STATE,
           ...parsed,
-          settings: { ...DEFAULT_STATE.settings, ...(parsed.settings || {}) }
+          settings: loadedSettings
         };
       }
     } catch (err) {
