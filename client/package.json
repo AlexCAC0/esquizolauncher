@@ -24,8 +24,7 @@
       "target": [
         "nsis"
       ],
-      "icon": "renderer/assets/logo.ico",
-      "signAndEditExecutable": false
+      "icon": "renderer/assets/logo.ico"
     },
     "nsis": {
       "oneClick": false,
