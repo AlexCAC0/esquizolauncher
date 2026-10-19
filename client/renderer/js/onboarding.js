@@ -223,6 +223,12 @@ async function startMicrosoftLoginFlow() {
 
     // Start polling in background
     isPollingMs = true;
+    if (window.api && window.api.onMicrosoftProgress) {
+      window.api.onMicrosoftProgress((msg) => {
+        const statusEl = document.getElementById('ms-status-text');
+        if (statusEl) statusEl.textContent = msg;
+      });
+    }
     pollMicrosoftAuth(res.device_code, res.interval);
   } catch (err) {
     errBox.textContent = err.message || 'Error al conectar con Microsoft.';
@@ -256,6 +262,9 @@ async function pollMicrosoftAuth(deviceCode, interval) {
 
 function openExternalUrl(e, url) {
   e.preventDefault();
-  // In Electron, opening external link in default browser
-  window.open(url, '_blank');
+  if (window.api && window.api.openExternalUrl) {
+    window.api.openExternalUrl(url);
+  } else {
+    window.open(url, '_blank');
+  }
 }

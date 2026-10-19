@@ -1,8 +1,8 @@
 const axios = require('axios');
 const api = require('../api');
 
-// Microsoft Azure Client ID for Minecraft
-const MS_CLIENT_ID = '00000000402b5328'; // Standard Mojang public client ID
+// Microsoft Live Connect OAuth URLs (standard for Minecraft public client 00000000402b5328)
+const MS_CLIENT_ID = '00000000402b5328';
 const MS_DEVICE_CODE_URL = 'https://login.live.com/oauth20_connect.srf';
 const MS_TOKEN_URL = 'https://login.live.com/oauth20_token.srf';
 
@@ -17,7 +17,7 @@ async function startDeviceAuth() {
   });
 
   const res = await axios.post(
-    'https://login.microsoftonline.com/consumers/oauth2/v2.0/devicecode',
+    MS_DEVICE_CODE_URL,
     params.toString(),
     {
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
@@ -27,7 +27,7 @@ async function startDeviceAuth() {
   return {
     device_code: res.data.device_code,
     user_code: res.data.user_code,
-    verification_uri: res.data.verification_uri,
+    verification_uri: res.data.verification_uri || 'https://www.microsoft.com/link',
     expires_in: res.data.expires_in,
     interval: res.data.interval || 5
   };
@@ -50,7 +50,7 @@ async function pollDeviceAuth(deviceCode, interval = 5, onProgress = () => {}) {
       });
 
       const res = await axios.post(
-        'https://login.microsoftonline.com/consumers/oauth2/v2.0/token',
+        MS_TOKEN_URL,
         params.toString(),
         {
           headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
@@ -71,7 +71,8 @@ async function pollDeviceAuth(deviceCode, interval = 5, onProgress = () => {}) {
       } else if (errCode === 'expired_token') {
         throw new Error('El código de verificación ha expirado. Inténtalo de nuevo.');
       } else {
-        throw new Error('Error de autenticación con Microsoft: ' + (err.response?.data?.error_description || err.message));
+        const desc = err.response?.data?.error_description || err.response?.data?.error || err.message;
+        throw new Error('Error de autenticación con Microsoft: ' + desc);
       }
     }
   }
