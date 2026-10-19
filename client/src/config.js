@@ -16,10 +16,10 @@ module.exports = {
   COPYRIGHT: 'Copyright (C) 2026 EsquizoStudios. Todos los derechos reservados. Software Privado y Propietario.',
   
   // Default Backend API endpoint (points to private Esquizo server)
-  DEFAULT_API_URL: 'http://localhost:3001',
+  DEFAULT_API_URL: 'http://koalahosting.asuscomm.com:3001/',
 
   // Discord Rich Presence Application Client ID (from https://discord.com/developers/applications)
-  DEFAULT_DISCORD_CLIENT_ID: '1342674338947268688',
+  DEFAULT_DISCORD_CLIENT_ID: '1560860753907421194',
 
   // Local storage directories
   PATHS: {
