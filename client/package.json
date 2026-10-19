@@ -9,14 +9,42 @@
   "main": "main.js",
   "scripts": {
     "start": "electron .",
-    "dev": "electron ."
+    "dev": "electron .",
+    "dist": "electron-builder --win --x64"
+  },
+  "build": {
+    "appId": "com.esquizostudios.launcher",
+    "productName": "EsquizoLauncher",
+    "copyright": "Copyright (C) 2026 EsquizoStudios. Todos los derechos reservados.",
+    "asar": true,
+    "directories": {
+      "output": "dist"
+    },
+    "win": {
+      "target": [
+        "nsis"
+      ],
+      "icon": "renderer/assets/logo.ico",
+      "signAndEditExecutable": false
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "EsquizoLauncher",
+      "artifactName": "EsquizoLauncher-Setup-${version}.${ext}"
+    }
   },
   "dependencies": {
     "adm-zip": "^0.6.1",
     "axios": "^1.20.0",
     "discord-rpc": "^4.0.1",
-    "electron": "^44.8.0",
     "minecraft-launcher-core": "^3.11.1",
     "uuid": "^14.0.3"
+  },
+  "devDependencies": {
+    "electron": "^44.8.0",
+    "electron-builder": "^25.1.8"
   }
 }

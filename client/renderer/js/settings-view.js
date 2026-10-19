@@ -17,14 +17,6 @@ async function showSettingsView() {
   const radio = document.querySelector(`input[name="opt-action-on-play"][value="${actionOnPlay}"]`);
   if (radio) radio.checked = true;
 
-  // 3. API URL
-  const apiInput = document.getElementById('settings-api-url');
-  if (apiInput) apiInput.value = settings.api_url || 'http://localhost:3001';
-
-  // 4. Discord RPC Client ID
-  const rpcInput = document.getElementById('settings-discord-rpc-id');
-  if (rpcInput) rpcInput.value = settings.discord_client_id || '';
-
   // 5. Account Details
   if (currentAccount) {
     document.getElementById('settings-username').textContent = currentAccount.username;
@@ -102,18 +94,10 @@ async function saveLauncherSettings() {
   const actionRadio = document.querySelector('input[name="opt-action-on-play"]:checked');
   const actionOnPlay = actionRadio ? actionRadio.value : 'keep';
 
-  const apiInput = document.getElementById('settings-api-url');
-  const apiUrl = apiInput ? apiInput.value.trim() : 'http://localhost:3001';
-
-  const rpcInput = document.getElementById('settings-discord-rpc-id');
-  const discordClientId = rpcInput ? rpcInput.value.trim() : '';
-
   await window.api.updateSettings({
     ram_max: ramMax,
     java_path: javaPath,
-    action_on_play: actionOnPlay,
-    api_url: apiUrl,
-    discord_client_id: discordClientId
+    action_on_play: actionOnPlay
   });
 
   if (typeof showToast === 'function') {
