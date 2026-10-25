@@ -1,11 +1,15 @@
 // Master Application Controller
 
+let pendingUpdateData = null;
+
 document.addEventListener('DOMContentLoaded', async () => {
   setupWindowControls();
   setupSidebarEvents();
   setupGameEventListeners();
 
   await initApp();
+  // Check for updates automatically in the background
+  checkAppUpdatesSilently();
 });
 
 // Window Titlebar Controls
@@ -83,4 +87,115 @@ function showToast(message) {
   toastTimeout = setTimeout(() => {
     toast.classList.remove('show');
   }, 2800);
+}
+
+// Auto-Updater Controller
+async function checkAppUpdatesSilently() {
+  try {
+    const res = await window.api.checkUpdate();
+    if (res && res.success && res.has_update) {
+      pendingUpdateData = res;
+      showUpdateModal(res);
+    }
+  } catch (err) {
+    console.log('[Updater] Error comprobando actualización:', err);
+  }
+}
+
+async function manualCheckForUpdates() {
+  const statusEl = document.getElementById('settings-update-status');
+  const btn = document.getElementById('btn-manual-check-update');
+  if (statusEl) statusEl.textContent = 'Comprobando servidores de EsquizoStudios...';
+  if (btn) btn.disabled = true;
+
+  try {
+    const res = await window.api.checkUpdate();
+    if (res && res.success) {
+      if (res.has_update) {
+        if (statusEl) statusEl.textContent = `¡Nueva versión v${res.latest_version} disponible!`;
+        pendingUpdateData = res;
+        showUpdateModal(res);
+      } else {
+        if (statusEl) statusEl.textContent = `Tu versión (${res.current_version}) está al día.`;
+        showToast('Ya tienes la versión más reciente de EsquizoLauncher.');
+      }
+    } else {
+      if (statusEl) statusEl.textContent = 'No se pudo contactar al servidor de actualizaciones.';
+      showToast('No se pudo verificar actualizaciones.');
+    }
+  } catch (err) {
+    if (statusEl) statusEl.textContent = 'Error al comprobar actualizaciones.';
+  } finally {
+    if (btn) btn.disabled = false;
+  }
+}
+
+function showUpdateModal(updateInfo) {
+  const modal = document.getElementById('modal-updater');
+  if (!modal) return;
+
+  document.getElementById('updater-version-tag').textContent = `Versión v${updateInfo.latest_version}`;
+  const sizeMb = (updateInfo.file_size / (1024 * 1024)).toFixed(1);
+  document.getElementById('updater-size-tag').textContent = `Tamaño: ${sizeMb} MB &bull; Fecha: ${new Date(updateInfo.published_at).toLocaleDateString()}`;
+
+  const notesBox = document.getElementById('updater-notes-box');
+  if (notesBox) {
+    notesBox.textContent = updateInfo.notes ? `Novedades:\n${updateInfo.notes}` : 'Mejoras de rendimiento y estabilidad para eventos.';
+  }
+
+  // Handle mandatory update
+  const cancelBtn = document.getElementById('btn-updater-cancel');
+  const closeBtn = document.getElementById('updater-btn-close');
+  if (updateInfo.is_mandatory) {
+    if (cancelBtn) cancelBtn.style.display = 'none';
+    if (closeBtn) closeBtn.style.display = 'none';
+    document.getElementById('updater-description').innerHTML = '<strong style="color:var(--danger)">Esta actualización es obligatoria</strong> para poder conectarse y jugar en los eventos de EsquizoStudios.';
+  } else {
+    if (cancelBtn) cancelBtn.style.display = 'inline-block';
+    if (closeBtn) closeBtn.style.display = 'block';
+  }
+
+  document.getElementById('updater-progress-container').style.display = 'none';
+  document.getElementById('updater-error-box').style.display = 'none';
+  document.getElementById('btn-updater-start').disabled = false;
+  document.getElementById('btn-updater-start').textContent = 'Descargar e Instalar Ahora';
+
+  modal.classList.add('open');
+}
+
+async function startUpdateDownload() {
+  if (!pendingUpdateData || !pendingUpdateData.download_url) return;
+
+  const btnStart = document.getElementById('btn-updater-start');
+  const cancelBtn = document.getElementById('btn-updater-cancel');
+  const progressBox = document.getElementById('updater-progress-container');
+  const errorBox = document.getElementById('updater-error-box');
+  const progressBar = document.getElementById('updater-progress-bar');
+  const percentText = document.getElementById('updater-progress-percent');
+  const statusText = document.getElementById('updater-progress-text');
+
+  btnStart.disabled = true;
+  btnStart.textContent = 'Descargando...';
+  if (cancelBtn) cancelBtn.style.display = 'none';
+  errorBox.style.display = 'none';
+  progressBox.style.display = 'block';
+
+  // Progress listener
+  window.api.onUpdateProgress((data) => {
+    progressBar.style.width = `${data.percent}%`;
+    percentText.textContent = `${data.percent}%`;
+    const dlMb = (data.downloaded / (1024 * 1024)).toFixed(1);
+    const totMb = (data.total / (1024 * 1024)).toFixed(1);
+    statusText.textContent = `Descargando: ${dlMb} MB de ${totMb} MB...`;
+  });
+
+  const res = await window.api.downloadAndInstallUpdate(pendingUpdateData.download_url);
+  if (!res.success) {
+    errorBox.textContent = `Error al actualizar: ${res.error || 'Fallo desconocido'}`;
+    errorBox.style.display = 'block';
+    btnStart.disabled = false;
+    btnStart.textContent = 'Reintentar Descarga';
+  } else {
+    statusText.textContent = '¡Descarga completada! Reiniciando launcher con el instalador...';
+  }
 }

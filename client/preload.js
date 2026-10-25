@@ -53,6 +53,15 @@ contextBridge.exposeInMainWorld('api', {
   browseJavaPath: () => ipcRenderer.invoke('system:browse-java'),
   openExternalUrl: (url) => ipcRenderer.invoke('system:open-url', url),
 
+  // Auto-Updates
+  checkUpdate: () => ipcRenderer.invoke('updater:check'),
+  downloadAndInstallUpdate: (downloadUrl) => ipcRenderer.invoke('updater:download-and-install', downloadUrl),
+  onUpdateProgress: (callback) => {
+    const handler = (event, data) => callback(data);
+    ipcRenderer.on('updater:progress', handler);
+    return () => ipcRenderer.removeListener('updater:progress', handler);
+  },
+
   // Window Controls
   minimizeWindow: () => ipcRenderer.send('window:minimize'),
   maximizeWindow: () => ipcRenderer.send('window:maximize'),

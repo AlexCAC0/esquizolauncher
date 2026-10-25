@@ -25,9 +25,9 @@ Al utilizar este cliente y participar en nuestros eventos, aceptas de manera obl
 El software, las modificaciones propietarias, los complementos, la identidad visual y los recursos de los eventos son propiedad exclusiva de **EsquizoStudios** y **NO** son de código abierto.
 Queda estrictamente prohibida la descompilación, extracción, redistribución o filtración de cualquier archivo, mod o asset entregado a través del launcher.
 
-### 2. Política Anti-Filtraciones (Anti-Leak)
-Para proteger la integridad y originalidad de los eventos, el launcher ejecuta un protocolo de protección estricto: todos los mods de cada instancia se almacenan de forma efímera durante la sesión de juego y son eliminados automáticamente al cerrarse Minecraft.
-Cualquier intento deliberado de interceptar, clonar o evadir este mecanismo resultará en el veto permanente del usuario y de su cuenta de Discord asociada.
+### 2. Política de Recursos y Archivos de Eventos
+Los recursos, modificaciones y complementos utilizados durante las partidas son suministrados por los servidores de **EsquizoStudios** para la ejecución exclusiva de las sesiones oficiales. Queda prohibida la extracción, redistribución o copia no autorizada de dichos elementos.
+El incumplimiento resultará en el cese inmediato de acceso y la revocación de la participación en futuros eventos.
 
 ### 3. Conducta y Juego Limpio
 - Está prohibido el uso de clientes modificados externos, hacks, macros o herramientas no autorizadas.

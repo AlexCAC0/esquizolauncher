@@ -298,6 +298,71 @@ function setupIpcHandlers() {
     return true;
   });
 
+  // Client Auto-Updates
+  ipcMain.handle('updater:check', async () => {
+    try {
+      const data = await api.checkClientUpdate(config.VERSION);
+      return { success: true, ...data };
+    } catch (err) {
+      return { success: false, error: err.message };
+    }
+  });
+
+  ipcMain.handle('updater:download-and-install', async (event, downloadUrl) => {
+    try {
+      const axios = require('axios');
+      const fs = require('fs');
+      const os = require('os');
+      const { spawn } = require('child_process');
+
+      const fullUrl = downloadUrl.startsWith('http')
+        ? downloadUrl
+        : `${api.getBaseUrl()}${downloadUrl}`;
+
+      const tempInstallerPath = path.join(os.tmpdir(), `EsquizoLauncher-Setup-Update-${Date.now()}.exe`);
+
+      const response = await axios({
+        method: 'GET',
+        url: fullUrl,
+        responseType: 'stream',
+        timeout: 120000
+      });
+
+      const total = parseInt(response.headers['content-length'] || '0', 10);
+      let downloaded = 0;
+
+      const writer = fs.createWriteStream(tempInstallerPath);
+      response.data.on('data', chunk => {
+        downloaded += chunk.length;
+        const percent = total > 0 ? Math.round((downloaded / total) * 100) : 0;
+        if (mainWindow) {
+          mainWindow.webContents.send('updater:progress', { downloaded, total, percent });
+        }
+      });
+
+      response.data.pipe(writer);
+
+      await new Promise((resolve, reject) => {
+        writer.on('finish', resolve);
+        writer.on('error', reject);
+      });
+
+      // Spawn installer detached and exit launcher
+      setTimeout(() => {
+        spawn(tempInstallerPath, ['--updated'], {
+          detached: true,
+          stdio: 'ignore'
+        }).unref();
+        app.quit();
+      }, 800);
+
+      return { success: true };
+    } catch (err) {
+      console.error('[Auto-Update Error]', err);
+      return { success: false, error: err.message };
+    }
+  });
+
   // Window Controls
   ipcMain.on('window:minimize', () => {
     if (mainWindow) mainWindow.minimize();

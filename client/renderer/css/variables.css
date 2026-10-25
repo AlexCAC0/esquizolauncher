@@ -1,32 +1,41 @@
 :root {
-  /* EsquizoStudios Palette: Deep black with rich violet and bluish neon accents */
-  --bg-deep: #07050e;
-  --bg-main: #0c0919;
-  --bg-surface: #140f2b;
-  --bg-card: #191436;
-  --bg-card-hover: #221b47;
-  --bg-input: #0e0a1f;
+  /* EsquizoStudios Cyberpunk Dark Luxury Palette */
+  --bg-deep: #05030a;
+  --bg-main: #090614;
+  --bg-surface: #100b24;
+  --bg-card: rgba(22, 16, 48, 0.75);
+  --bg-card-hover: rgba(35, 26, 75, 0.9);
+  --bg-glass: rgba(16, 11, 36, 0.65);
+  --bg-input: #0a0718;
 
   /* Accent & Gradients */
-  --primary: #8b5cf6;
-  --primary-hover: #7c3aed;
-  --primary-dark: #6d28d9;
-  --primary-glow: rgba(139, 92, 246, 0.4);
+  --primary: #9333ea;
+  --primary-light: #a855f7;
+  --primary-hover: #7e22ce;
+  --primary-dark: #581c87;
+  --primary-glow: rgba(168, 85, 247, 0.45);
 
-  --secondary: #3b82f6;
-  --secondary-glow: rgba(59, 130, 246, 0.35);
+  --secondary: #2563eb;
+  --secondary-light: #3b82f6;
+  --secondary-glow: rgba(37, 99, 235, 0.4);
 
   --accent-cyan: #06b6d4;
-  --accent-pink: #ec4899;
+  --accent-cyan-glow: rgba(6, 182, 212, 0.4);
+  --accent-pink: #f43f5e;
+
+  --gradient-brand: linear-gradient(135deg, #a855f7 0%, #3b82f6 100%);
+  --gradient-glow: linear-gradient(135deg, rgba(168, 85, 247, 0.3) 0%, rgba(59, 130, 246, 0.3) 100%);
+  --gradient-button: linear-gradient(135deg, #9333ea 0%, #2563eb 100%);
+  --gradient-button-hover: linear-gradient(135deg, #a855f7 0%, #3b82f6 100%);
 
   /* Borders & Dividers */
-  --border-subtle: #241d4a;
-  --border-medium: #382d6e;
-  --border-glow: #8b5cf688;
+  --border-subtle: rgba(255, 255, 255, 0.08);
+  --border-medium: rgba(168, 85, 247, 0.25);
+  --border-glow: rgba(168, 85, 247, 0.6);
 
   /* Typography */
   --text-white: #ffffff;
-  --text-primary: #f1f5f9;
+  --text-primary: #f8fafc;
   --text-secondary: #94a3b8;
   --text-muted: #64748b;
 

@@ -67,6 +67,12 @@ async function pollDiscordClientAuth(sessionId) {
   return res.data;
 }
 
+async function checkClientUpdate(currentVersion) {
+  const url = `${getBaseUrl()}/api/client/updates/check?version=${encodeURIComponent(currentVersion)}`;
+  const res = await axios.get(url, { timeout: 8000 });
+  return res.data;
+}
+
 module.exports = {
   getBaseUrl,
   fetchStatus,
@@ -77,5 +83,6 @@ module.exports = {
   claimInstance,
   fetchInstanceManifest,
   startDiscordClientAuth,
-  pollDiscordClientAuth
+  pollDiscordClientAuth,
+  checkClientUpdate
 };
