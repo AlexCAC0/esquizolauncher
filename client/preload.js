@@ -52,6 +52,8 @@ contextBridge.exposeInMainWorld('api', {
   getJavaList: () => ipcRenderer.invoke('system:get-javas'),
   browseJavaPath: () => ipcRenderer.invoke('system:browse-java'),
   openExternalUrl: (url) => ipcRenderer.invoke('system:open-url', url),
+  getServerStatus: (instanceId) => ipcRenderer.invoke('instance:server-status', instanceId),
+  getCrashLogs: (instanceId) => ipcRenderer.invoke('system:get-crash-logs', instanceId),
 
   // Auto-Updates
   checkUpdate: () => ipcRenderer.invoke('updater:check'),

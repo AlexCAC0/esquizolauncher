@@ -1391,3 +1391,21 @@ small {
   background: rgba(139, 92, 246, 0.15);
   border-color: var(--primary);
 }
+
+/* STREAMER MODE MASKS */
+body.streamer-mode-active #greeting-player-nick,
+body.streamer-mode-active #modal-account-name,
+body.streamer-mode-active #settings-username,
+body.streamer-mode-active #settings-discord-status,
+body.streamer-mode-active #modal-discord-tag {
+  filter: blur(5px);
+  user-select: none;
+  transition: filter 0.2s ease;
+}
+
+body.streamer-mode-active #greeting-player-nick:hover,
+body.streamer-mode-active #modal-account-name:hover,
+body.streamer-mode-active #settings-username:hover,
+body.streamer-mode-active #settings-discord-status:hover {
+  filter: none;
+}

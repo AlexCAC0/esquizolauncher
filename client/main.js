@@ -363,6 +363,49 @@ function setupIpcHandlers() {
     }
   });
 
+  // Server live ping & diagnostic
+  ipcMain.handle('instance:server-status', async (event, instanceId) => {
+    try {
+      const data = await api.fetchInstanceServerStatus(instanceId);
+      return { success: true, ...data };
+    } catch (err) {
+      return { success: false, online: false, error: err.message };
+    }
+  });
+
+  // Diagnostics & Crash Logs
+  ipcMain.handle('system:get-crash-logs', async (event, instanceId) => {
+    try {
+      const fs = require('fs');
+      let logPath = null;
+      if (instanceId) {
+        logPath = path.join(config.PATHS.INSTANCES, instanceId, 'logs', 'latest.log');
+      }
+      if (!logPath || !fs.existsSync(logPath)) {
+        // Fallback: check recent instances
+        const instDirs = fs.existsSync(config.PATHS.INSTANCES) ? fs.readdirSync(config.PATHS.INSTANCES) : [];
+        for (const dir of instDirs) {
+          const candidate = path.join(config.PATHS.INSTANCES, dir, 'logs', 'latest.log');
+          if (fs.existsSync(candidate)) {
+            logPath = candidate;
+            break;
+          }
+        }
+      }
+
+      if (!logPath || !fs.existsSync(logPath)) {
+        return { success: false, log: 'No se encontraron registros de log de Minecraft aún en el sistema.' };
+      }
+
+      const content = fs.readFileSync(logPath, 'utf8');
+      const lines = content.split('\n');
+      const lastLines = lines.slice(-150).join('\n'); // Last 150 lines
+      return { success: true, log: lastLines, fullPath: logPath };
+    } catch (err) {
+      return { success: false, error: err.message };
+    }
+  });
+
   // Window Controls
   ipcMain.on('window:minimize', () => {
     if (mainWindow) mainWindow.minimize();

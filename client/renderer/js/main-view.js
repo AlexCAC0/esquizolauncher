@@ -107,6 +107,50 @@ async function showInstanceView(instanceId) {
 
   // Reset Play Button State
   resetPlayButton();
+
+  // Live Server Ping Check
+  checkInstanceServerLive(inst.id);
+}
+
+let currentInstanceServerIp = null;
+
+async function checkInstanceServerLive(instanceId) {
+  const pill = document.getElementById('inst-view-server-pill');
+  const dot = document.getElementById('inst-view-server-dot');
+  const text = document.getElementById('inst-view-server-text');
+
+  if (!pill) return;
+  pill.style.display = 'none';
+  currentInstanceServerIp = null;
+
+  try {
+    const res = await window.api.getServerStatus(instanceId);
+    if (res && res.success && res.has_server) {
+      currentInstanceServerIp = res.server_ip;
+      pill.style.display = 'inline-flex';
+      if (res.online) {
+        dot.style.background = '#10b981';
+        dot.style.boxShadow = '0 0 8px #10b981';
+        text.innerHTML = `🟢 <strong>${res.players?.online || 0}</strong>/${res.players?.max || 0} Online &bull; <small>${res.ping}ms</small>`;
+      } else {
+        dot.style.background = '#ef4444';
+        dot.style.boxShadow = '0 0 8px #ef4444';
+        text.innerHTML = `🔴 <strong>Offline</strong> &bull; <small>${escapeHtml(res.server_ip)}</small>`;
+      }
+    }
+  } catch (err) {
+    pill.style.display = 'none';
+  }
+}
+
+function copyServerIpToClipboard() {
+  if (currentInstanceServerIp) {
+    navigator.clipboard.writeText(currentInstanceServerIp).then(() => {
+      showToast(`IP del servidor copiada: ${currentInstanceServerIp}`);
+    }).catch(() => {
+      showToast(`IP: ${currentInstanceServerIp}`);
+    });
+  }
 }
 
 function resetPlayButton() {

@@ -22,6 +22,12 @@
       </div>
     </div>
     <div class="window-controls">
+      <button class="win-btn" id="btn-toggle-streamer-quick" title="Modo Streamer (Ocultar datos sensibles)" onclick="toggleStreamerModeQuick()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+          <circle cx="12" cy="12" r="3"/>
+        </svg>
+      </button>
       <button class="win-btn" id="win-min" title="Minimizar">
         <svg width="10" height="1" viewBox="0 0 10 1"><rect width="10" height="1" fill="currentColor"/></svg>
       </button>
@@ -353,6 +359,10 @@
                   <span class="inst-tag" id="inst-view-version">Minecraft 1.20.1</span>
                   <span class="inst-tag" id="inst-view-loader">Fabric</span>
                   <span class="inst-tag inst-tag-private">🔒 PRIVADO</span>
+                  <span class="inst-tag" id="inst-view-server-pill" style="display:none; cursor:pointer;" onclick="copyServerIpToClipboard()" title="Haz clic para copiar la IP">
+                    <span id="inst-view-server-dot" style="display:inline-block; width:8px; height:8px; border-radius:50%; background:#10b981; margin-right:5px;"></span>
+                    <span id="inst-view-server-text">Comprobando servidor...</span>
+                  </span>
                 </div>
                 <h1 id="inst-view-title" class="inst-view-title">Nombre de la Instancia</h1>
                 <p id="inst-view-description" class="inst-view-description">Descripción del evento...</p>
@@ -506,6 +516,26 @@
                     <small>Oculta la ventana y la restaura automáticamente al cerrarse Minecraft.</small>
                   </div>
                 </label>
+              </div>
+
+              <!-- Streamer Mode Toggle -->
+              <div style="margin-top: 24px; padding-top: 18px; border-top: 1px solid var(--border-subtle); display:flex; align-items:center; justify-content:space-between;">
+                <div>
+                  <strong style="color:#fff; font-size:14px; display:block;">Modo Streamer / Creador</strong>
+                  <small style="color:var(--text-secondary); font-size:12px;">Oculta tu Discord ID, nombre y códigos de acceso con asteriscos (****) para transmitir en vivo.</small>
+                </div>
+                <input type="checkbox" id="opt-streamer-mode" style="width:20px; height:20px; cursor:pointer;" onchange="toggleStreamerMode(this.checked)">
+              </div>
+
+              <!-- Diagnostic Logs Button -->
+              <div style="margin-top: 18px; padding-top: 18px; border-top: 1px solid var(--border-subtle); display:flex; align-items:center; justify-content:space-between;">
+                <div>
+                  <strong style="color:#fff; font-size:14px; display:block;">Diagnóstico y Reporte de Errores</strong>
+                  <small style="color:var(--text-secondary); font-size:12px;">Copia las últimas líneas del registro de Minecraft (latest.log) para enviarlas al soporte de Discord.</small>
+                </div>
+                <button class="btn btn-secondary btn-sm" onclick="copyDiagnosticLogs()">
+                  Copiar Logs de Error
+                </button>
               </div>
             </div>
           </div>

@@ -17,6 +17,10 @@ async function showSettingsView() {
   const radio = document.querySelector(`input[name="opt-action-on-play"][value="${actionOnPlay}"]`);
   if (radio) radio.checked = true;
 
+  // Streamer Mode checkbox
+  const streamerChk = document.getElementById('opt-streamer-mode');
+  if (streamerChk) streamerChk.checked = isStreamerModeActive();
+
   // 5. Account Details
   if (currentAccount) {
     document.getElementById('settings-username').textContent = currentAccount.username;
@@ -130,5 +134,57 @@ async function unlinkDiscordFromSettings() {
     showSettingsView();
   } else {
     alert(`Error: ${res.error || 'No se pudo desvincular Discord.'}`);
+  }
+}
+
+// --- STREAMER MODE CONTROLLER ---
+let streamerMode = localStorage.getItem('esquizo_streamer_mode') === 'true';
+
+function isStreamerModeActive() {
+  return streamerMode;
+}
+
+function toggleStreamerMode(enable) {
+  streamerMode = enable;
+  localStorage.setItem('esquizo_streamer_mode', enable ? 'true' : 'false');
+  applyStreamerMode();
+  showToast(enable ? '🛡️ Modo Streamer Activado' : 'Modo Streamer Desactivado');
+}
+
+function toggleStreamerModeQuick() {
+  toggleStreamerMode(!streamerMode);
+  const chk = document.getElementById('opt-streamer-mode');
+  if (chk) chk.checked = streamerMode;
+}
+
+function applyStreamerMode() {
+  document.body.classList.toggle('streamer-mode-active', streamerMode);
+  const btn = document.getElementById('btn-toggle-streamer-quick');
+  if (btn) {
+    btn.style.color = streamerMode ? '#a855f7' : 'var(--text-muted)';
+  }
+}
+
+// Initial apply
+document.addEventListener('DOMContentLoaded', () => {
+  applyStreamerMode();
+});
+
+// --- DIAGNOSTIC LOGS COPIER ---
+async function copyDiagnosticLogs() {
+  try {
+    const storeData = await window.api.getStore();
+    const instId = storeData.selected_instance_id || null;
+    const res = await window.api.getCrashLogs(instId);
+
+    if (res && res.success && res.log) {
+      const formattedLog = `=== EsquizoLauncher Diagnóstico ===\nFecha: ${new Date().toLocaleString()}\nInstancia: ${instId || 'General'}\nArchivo: ${res.fullPath}\n====================================\n\n${res.log}`;
+      await navigator.clipboard.writeText(formattedLog);
+      showToast('📋 Logs de Minecraft copiados al portapapeles');
+    } else {
+      showToast(res.log || 'No se encontraron registros de error recientes.');
+    }
+  } catch (err) {
+    showToast('Error al obtener los logs de diagnóstico');
   }
 }

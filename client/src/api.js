@@ -73,6 +73,12 @@ async function checkClientUpdate(currentVersion) {
   return res.data;
 }
 
+async function fetchInstanceServerStatus(instanceId) {
+  const url = `${getBaseUrl()}/api/client/instance/${instanceId}/server-status`;
+  const res = await axios.get(url, { timeout: 4500 });
+  return res.data;
+}
+
 module.exports = {
   getBaseUrl,
   fetchStatus,
@@ -84,5 +90,6 @@ module.exports = {
   fetchInstanceManifest,
   startDiscordClientAuth,
   pollDiscordClientAuth,
-  checkClientUpdate
+  checkClientUpdate,
+  fetchInstanceServerStatus
 };
