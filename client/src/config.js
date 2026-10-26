@@ -12,7 +12,7 @@ const LAUNCHER_DIR = path.join(APPDATA, '.esquizolauncher');
 module.exports = {
   STUDIO_NAME: 'EsquizoStudios',
   APP_TITLE: 'EsquizoLauncher',
-  VERSION: '1.0.1',
+  VERSION: '1.0.2',
   COPYRIGHT: 'Copyright (C) 2026 EsquizoStudios. Todos los derechos reservados. Software Privado y Propietario.',
   
   // Default Backend API endpoint (points to private Esquizo server)
