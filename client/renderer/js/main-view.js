@@ -137,6 +137,15 @@ async function checkInstanceServerLive(instanceId) {
         dot.style.boxShadow = '0 0 8px #ef4444';
         text.innerHTML = `🔴 <strong>Servidor Offline</strong>`;
       }
+    } else if (res && !res.has_server) {
+      // Instancia sin servidor asignado en el panel
+      pill.style.display = 'none';
+    } else {
+      // En caso de que no pueda conectar o devuelva error temporal, mostrar estado offline
+      pill.style.display = 'inline-flex';
+      dot.style.background = '#ef4444';
+      dot.style.boxShadow = '0 0 8px #ef4444';
+      text.innerHTML = `🔴 <strong>Servidor Offline</strong>`;
     }
   } catch (err) {
     pill.style.display = 'none';
