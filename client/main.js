@@ -302,6 +302,10 @@ function setupIpcHandlers() {
   });
 
   // Client Auto-Updates
+  ipcMain.handle('app:version', () => {
+    return config.VERSION || '1.0.4';
+  });
+
   ipcMain.handle('updater:check', async () => {
     try {
       const data = await api.checkClientUpdate(config.VERSION);

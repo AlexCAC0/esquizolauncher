@@ -40,7 +40,16 @@ async function showSettingsView() {
     }
   }
 
-  // 5. Load Java List
+  // 6. App Version in Community / Settings
+  try {
+    const appVer = await window.api.getAppVersion();
+    const verEl = document.getElementById('settings-client-version');
+    if (verEl && appVer) {
+      verEl.textContent = `v${appVer}`;
+    }
+  } catch (err) {}
+
+  // 7. Load Java List
   loadJavaInstallations(settings.java_path);
 }
 

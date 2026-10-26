@@ -47,6 +47,7 @@ contextBridge.exposeInMainWorld('api', {
   showScreenshotInFolder: (filePath) => ipcRenderer.invoke('gallery:show-in-folder', filePath),
 
   // Settings & System
+  getAppVersion: () => ipcRenderer.invoke('app:version'),
   getSettings: () => ipcRenderer.invoke('settings:get'),
   updateSettings: (settings) => ipcRenderer.invoke('settings:update', settings),
   getJavaList: () => ipcRenderer.invoke('system:get-javas'),
