@@ -79,6 +79,26 @@ async function fetchInstanceServerStatus(instanceId) {
   return res.data;
 }
 
+async function sendHeartbeat(data) {
+  try {
+    const url = `${getBaseUrl()}/api/client/telemetry/heartbeat`;
+    const res = await axios.post(url, data, { timeout: 4000 });
+    return res.data;
+  } catch (err) {
+    return { ok: false };
+  }
+}
+
+async function recordLaunchTelemetry(instanceId, username) {
+  try {
+    const url = `${getBaseUrl()}/api/client/telemetry/launch`;
+    const res = await axios.post(url, { instance_id: instanceId, username }, { timeout: 4000 });
+    return res.data;
+  } catch (err) {
+    return { ok: false };
+  }
+}
+
 module.exports = {
   getBaseUrl,
   fetchStatus,
@@ -91,5 +111,7 @@ module.exports = {
   startDiscordClientAuth,
   pollDiscordClientAuth,
   checkClientUpdate,
-  fetchInstanceServerStatus
+  fetchInstanceServerStatus,
+  sendHeartbeat,
+  recordLaunchTelemetry
 };

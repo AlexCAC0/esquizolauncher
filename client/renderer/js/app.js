@@ -10,6 +10,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   await initApp();
   // Check for updates automatically in the background
   checkAppUpdatesSilently();
+  // Iniciar telemetría periódica & escuchar broadcasts
+  setupTelemetryAndBroadcasts();
 });
 
 // Window Titlebar Controls
@@ -198,4 +200,95 @@ async function startUpdateDownload() {
   } else {
     statusText.textContent = '¡Descarga completada! Reiniciando launcher con el instalador...';
   }
+}
+
+/* ==========================================================================
+   TELEMETRÍA HEARTBEAT & POP-UP BROADCASTS
+   ========================================================================== */
+let activeBroadcastId = null;
+
+function setupTelemetryAndBroadcasts() {
+  // Listener de broadcasts que envia el main process
+  window.api.onBroadcastAlert((broadcast) => {
+    handleIncomingBroadcast(broadcast);
+  });
+
+  // Enviar heartbeat inicial y luego cada 25 segundos
+  sendClientHeartbeat();
+  setInterval(sendClientHeartbeat, 25000);
+}
+
+async function sendClientHeartbeat() {
+  try {
+    const storeData = await window.api.getStore();
+    const isPlaying = await window.api.isGameRunning();
+    const selectedInst = storeData.selected_instance_id;
+    const currentAcc = storeData.current_account;
+
+    const res = await window.api.sendHeartbeat({
+      username: currentAcc ? currentAcc.username : 'Invitado',
+      instance_id: isPlaying ? selectedInst : (selectedInst || 'Menu'),
+      status: isPlaying ? 'playing' : 'idle',
+      java_version: storeData.settings?.java_path ? 'Custom' : 'Default'
+    });
+
+    if (res && res.broadcast) {
+      handleIncomingBroadcast(res.broadcast);
+    }
+  } catch (err) {
+    // Silencioso
+  }
+}
+
+function handleIncomingBroadcast(broadcast) {
+  if (!broadcast || !broadcast.id) return;
+
+  // Si ya lo desestimó en esta sesión o antes
+  const dismissedId = localStorage.getItem('dismissed_broadcast_id');
+  if (dismissedId === broadcast.id) return;
+
+  activeBroadcastId = broadcast.id;
+
+  const modal = document.getElementById('modal-broadcast-alert');
+  const badge = document.getElementById('broadcast-alert-badge');
+  const title = document.getElementById('broadcast-alert-title');
+  const msg = document.getElementById('broadcast-alert-message');
+  const author = document.getElementById('broadcast-alert-author');
+  const icon = document.getElementById('broadcast-alert-icon');
+
+  if (!modal) return;
+
+  title.textContent = broadcast.title || 'Aviso Oficial';
+  msg.textContent = broadcast.message || '';
+  author.textContent = `Emitido por: ${broadcast.author || 'Staff'} · EsquizoStudios`;
+
+  if (broadcast.type === 'urgent') {
+    badge.textContent = 'URGENTE / CRÍTICO';
+    badge.style.background = 'rgba(239, 68, 68, 0.2)';
+    badge.style.color = '#ef4444';
+    badge.style.borderColor = 'rgba(239, 68, 68, 0.4)';
+    icon.textContent = '🚨';
+  } else if (broadcast.type === 'warning') {
+    badge.textContent = 'ADVERTENCIA';
+    badge.style.background = 'rgba(245, 158, 11, 0.2)';
+    badge.style.color = '#f59e0b';
+    badge.style.borderColor = 'rgba(245, 158, 11, 0.4)';
+    icon.textContent = '⚠️';
+  } else {
+    badge.textContent = 'COMUNICADO OFICIAL';
+    badge.style.background = 'rgba(59, 130, 246, 0.2)';
+    badge.style.color = '#38bdf8';
+    badge.style.borderColor = 'rgba(59, 130, 246, 0.4)';
+    icon.textContent = '📢';
+  }
+
+  modal.classList.add('open');
+}
+
+function closeBroadcastAlert() {
+  if (activeBroadcastId) {
+    localStorage.setItem('dismissed_broadcast_id', activeBroadcastId);
+  }
+  const modal = document.getElementById('modal-broadcast-alert');
+  if (modal) modal.classList.remove('open');
 }

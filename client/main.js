@@ -215,6 +215,9 @@ function setupIpcHandlers() {
           }
         }
       );
+      // Telemetria de lanzamiento
+      const currentAcc = store.getCurrentAccount();
+      api.recordLaunchTelemetry(instanceId, currentAcc ? currentAcc.username : 'Unknown').catch(() => {});
       return { success: true };
     } catch (err) {
       discordRpc.setStandby();
@@ -403,6 +406,24 @@ function setupIpcHandlers() {
       return { success: true, log: lastLines, fullPath: logPath };
     } catch (err) {
       return { success: false, error: err.message };
+    }
+  });
+
+  // Telemetry & Heartbeat
+  const clientSessionId = require('crypto').randomBytes(8).toString('hex');
+  ipcMain.handle('telemetry:heartbeat', async (event, data) => {
+    try {
+      const payload = {
+        session_id: clientSessionId,
+        ...data
+      };
+      const res = await api.sendHeartbeat(payload);
+      if (res && res.broadcast && mainWindow) {
+        mainWindow.webContents.send('telemetry:broadcast', res.broadcast);
+      }
+      return res;
+    } catch (err) {
+      return { ok: false };
     }
   });
 

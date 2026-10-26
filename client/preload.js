@@ -64,6 +64,14 @@ contextBridge.exposeInMainWorld('api', {
     return () => ipcRenderer.removeListener('updater:progress', handler);
   },
 
+  // Telemetry & Broadcast
+  sendHeartbeat: (data) => ipcRenderer.invoke('telemetry:heartbeat', data),
+  onBroadcastAlert: (callback) => {
+    const handler = (event, alert) => callback(alert);
+    ipcRenderer.on('telemetry:broadcast', handler);
+    return () => ipcRenderer.removeListener('telemetry:broadcast', handler);
+  },
+
   // Window Controls
   minimizeWindow: () => ipcRenderer.send('window:minimize'),
   maximizeWindow: () => ipcRenderer.send('window:maximize'),

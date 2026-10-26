@@ -749,6 +749,33 @@
     </div>
   </div>
 
+  <!-- MODAL: BROADCAST ALERT POPUP -->
+  <div id="modal-broadcast-alert" class="modal">
+    <div class="modal-card" style="max-width: 480px; border: 1px solid rgba(168, 85, 247, 0.4); box-shadow: 0 0 35px rgba(168, 85, 247, 0.25);">
+      <div class="modal-header" style="border-bottom: 1px solid var(--border-subtle); padding-bottom: 12px;">
+        <div style="display:flex; align-items:center; gap: 10px;">
+          <span id="broadcast-alert-badge" class="badge" style="background: rgba(168, 85, 247, 0.2); color: var(--primary-light); border: 1px solid var(--border-medium); font-size: 11px;">AVISO GLOBAL</span>
+          <h3 id="broadcast-alert-title" style="margin:0; font-size: 16px; font-weight: 700; color: #fff;">Comunicado Oficial</h3>
+        </div>
+        <button class="btn-modal-close" onclick="closeBroadcastAlert()">&times;</button>
+      </div>
+      <div class="modal-body" style="padding: 20px 0;">
+        <div id="broadcast-alert-icon" style="font-size: 32px; margin-bottom: 12px; text-align: center;">📢</div>
+        <div id="broadcast-alert-message" style="font-size: 14px; line-height: 1.6; color: #f1f5f9; white-space: pre-wrap; background: rgba(0,0,0,0.25); border: 1px solid var(--border-subtle); border-radius: 8px; padding: 14px; max-height: 220px; overflow-y: auto;">
+          Mensaje de la administración...
+        </div>
+        <div id="broadcast-alert-author" style="font-size: 11px; color: var(--text-muted); margin-top: 10px; text-align: right;">
+          Emitido por Staff
+        </div>
+      </div>
+      <div class="modal-footer" style="border-top: 1px solid var(--border-subtle); padding-top: 14px;">
+        <button class="btn btn-primary" style="width: 100%;" onclick="closeBroadcastAlert()">
+          Entendido
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- Toast Notification -->
   <div id="app-toast" class="app-toast" style="display: none;"></div>
 
