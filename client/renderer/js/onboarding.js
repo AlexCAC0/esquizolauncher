@@ -1,6 +1,6 @@
 let currentOnboardingStep = 'welcome';
 
-function goToOnboardingStep(step) {
+async function goToOnboardingStep(step) {
   currentOnboardingStep = step;
   document.querySelectorAll('.onboarding-step').forEach(el => el.classList.remove('active'));
   const target = document.getElementById(`onboarding-step-${step}`);
@@ -9,6 +9,30 @@ function goToOnboardingStep(step) {
   if (step === 'tos') {
     loadTosContent();
   }
+
+  // Restore previously saved offline account data if available
+  try {
+    const storeData = await window.api.getStore();
+    if (storeData.accounts && storeData.accounts.length > 0) {
+      const lastAcc = storeData.accounts[storeData.accounts.length - 1];
+      if (lastAcc && lastAcc.type === 'offline') {
+        const userInp = document.getElementById('offline-username');
+        if (userInp && !userInp.value) userInp.value = lastAcc.username || '';
+        
+        if (lastAcc.discord_id) {
+          document.getElementById('offline-discord-id').value = lastAcc.discord_id;
+          document.getElementById('offline-discord-user').value = lastAcc.discord_username || '';
+          
+          document.getElementById('discord-linked-name').textContent = `@${lastAcc.discord_username || lastAcc.username}`;
+          document.getElementById('discord-linked-id').textContent = lastAcc.discord_id;
+          document.getElementById('discord-oauth-status').style.display = 'flex';
+          
+          const btnOauth = document.getElementById('btn-oauth-discord');
+          if (btnOauth) btnOauth.style.display = 'none';
+        }
+      }
+    }
+  } catch (e) {}
 }
 
 async function loadTosContent() {
@@ -180,15 +204,15 @@ async function handleOfflineLoginSubmit(e) {
       discord_username
     });
 
-    if (res.success) {
+    if (res && res.success) {
       // Enter main launcher
       onLoginSuccessful(res.account);
     } else {
-      errBox.textContent = res.error || 'Error al iniciar sesión.';
+      errBox.textContent = (res && res.error) ? res.error : 'Error al iniciar sesión.';
       errBox.style.display = 'block';
     }
   } catch (err) {
-    errBox.textContent = 'Error de conexión con el servidor.';
+    errBox.textContent = err.message || 'Error de conexión con el servidor.';
     errBox.style.display = 'block';
   } finally {
     btn.disabled = false;
@@ -220,6 +244,9 @@ async function startMicrosoftLoginFlow() {
     linkEl.textContent = res.verification_uri;
     document.getElementById('ms-code-display').style.display = 'block';
     document.getElementById('ms-status-text').textContent = 'Esperando que ingreses el código en tu navegador...';
+
+    // Abrir automáticamente el navegador para mayor comodidad del usuario
+    window.api.openExternalUrl(res.verification_uri);
 
     // Start polling in background
     isPollingMs = true;

@@ -22,7 +22,7 @@ async function loginOffline({ username, discord_id, discord_username, discord_av
   const res = await axios.post(
     url,
     { username, discord_id, discord_username, discord_avatar },
-    { timeout: 8000 }
+    { timeout: 15000 }
   );
   return res.data;
 }
@@ -32,7 +32,7 @@ async function loginMicrosoft(username) {
   const res = await axios.post(
     url,
     { username },
-    { timeout: 8000 }
+    { timeout: 15000 }
   );
   return res.data;
 }
