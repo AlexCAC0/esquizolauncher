@@ -138,6 +138,30 @@
   margin-bottom: 20px;
 }
 
+/* ONBOARDING STEPS */
+.onboarding-step {
+  display: none;
+}
+.onboarding-step.active {
+  display: block;
+}
+
+/* LOGIN TAB CONTENTS */
+.login-tab-content {
+  display: none;
+}
+.login-tab-content.active {
+  display: block;
+}
+
+.step-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 20px;
+}
+
 /* LOGIN TABS */
 .login-tabs {
   display: flex;
